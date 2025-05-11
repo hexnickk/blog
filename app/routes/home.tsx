@@ -1,77 +1,13 @@
 import type { Route } from "./+types/home";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkGfm from 'remark-gfm';
-import remarkRehype from 'remark-rehype';
-import rehypeStringify from 'rehype-stringify';
-import { matter } from "vfile-matter";
+import { ContentModule } from "~/modules/content";
 
-interface Post {
-  slug: string;
-  title: string;
-  date: string;
-  htmlContent: string;
+export async function loader({}: Route.LoaderArgs) {
+  const content = await ContentModule.listAll();
+
+  return content;
 }
 
-export async function loader({ }: Route.LoaderArgs): Promise<{ posts: Post[] }> {
-  const contentDir = path.join(process.cwd(), "content");
-  const filenames = await fs.readdir(contentDir);
-  const mdFiles = filenames.filter((filename) => filename.endsWith(".md"));
-
-  const processor = unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter, ['yaml'])
-    .use(function myUnifiedPluginHandlingYamlMatter() {
-      /**
-       * Transform.
-       *
-       * @param {Node} tree
-       *   Tree.
-       * @param {VFile} file
-       *   File.
-       * @returns {undefined}
-       *   Nothing.
-       */
-      return function (tree, file) {
-        matter(file)
-      }
-    })
-    .use(remarkGfm)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeStringify);
-
-  const postsData = await Promise.all(
-    mdFiles.map(async (filename) => {
-      const filePath = path.join(contentDir, filename);
-      const fileContent = await fs.readFile(filePath, "utf-8");
-
-      const vFile = await processor.process(fileContent);
-      const frontmatter = (vFile.data.matter || {}) as { title?: string; date?: string };
-      const htmlContent = String(vFile);
-
-      return {
-        slug: filename.replace(/\.md$/, ""),
-        title: frontmatter.title || "Untitled Post",
-        date: new Date(frontmatter.date || Date.now()),
-        htmlContent: htmlContent,
-      };
-    })
-  );
-
-  postsData.sort((a, b) => a.date.getTime() - b.date.getTime());
-
-  const posts: Post[] = postsData.map(post => ({
-    ...post,
-    date: post.date.toISOString().split('T')[0],
-  }));
-
-  return { posts };
-}
-
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: "New React Router App" },
     { name: "description", content: "Welcome to React Router!" },
@@ -79,20 +15,41 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { posts } = loaderData;
+  const { posts, links } = loaderData;
 
   return (
     <div>
-      <h1>Blog Posts</h1>
+      <h2>Blog Posts</h2>
       {posts.length === 0 ? (
         <p>No posts yet.</p>
       ) : (
         <ul>
-          {posts.map((post: Post) => (
+          {posts.map((post) => (
             <li key={post.slug}>
               <h2>{post.title}</h2>
-              <p>Date: {post.date}</p>
+              <p>Date: {post.date.toLocaleString()}</p>
               <div dangerouslySetInnerHTML={{ __html: post.htmlContent }} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h2>Links</h2>
+      {links.length === 0 ? (
+        <p>No links yet.</p>
+      ) : (
+        <ul>
+          {links.map((link) => (
+            <li key={link.slug}>
+              <h2>{link.title}</h2>
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link"
+              >
+                {link.title} @ {link.date.toLocaleString()}
+              </a>
             </li>
           ))}
         </ul>

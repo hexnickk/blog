@@ -6,7 +6,8 @@
     "build": "react-router build",
     "dev": "react-router dev --host 0.0.0.0",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "fmt": "prettier --write ."
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.2",
@@ -35,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "prettier": "^3.5.3",
     "shadcn": "^2.5.0",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.2.9",

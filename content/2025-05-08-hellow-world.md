@@ -1,6 +1,7 @@
 ---
-title: "Hello World"
-date: 2025-05-08
+type: post
+title: Hello World
+date: 2025-05-08T00:00:00.000Z
 draft: false
 tags: ["hello"]
 ---
