@@ -4,10 +4,11 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
-import React, { Fragment } from "react";
+import React, { Fragment, type ComponentProps } from "react";
 import { H1, H2, H3, H4 } from "app/components/ui/typography";
 import { jsx, jsxs } from "react/jsx-runtime";
 import { Header } from "app/components/header";
+import { cn } from "app/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -35,10 +36,18 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
       jsx,
       jsxs,
       components: {
-        h1: H1,
-        h2: H2,
-        h3: H3,
-        h4: H4,
+        h1: function H1Wrapper({ className, ...rest }: ComponentProps<'h1'>) {
+          return <H1 className={cn('mb-4 mt-6', className)} {...rest} />;
+        },
+        h2: function H2Wrapper({ className, ...rest }: ComponentProps<'h2'>) {
+          return <H2 className={cn('mb-3 mt-5', className)} {...rest} />;
+        },
+        h3: function H3Wrapper({ className, ...rest }: ComponentProps<'h3'>) {
+          return <H3 className={cn('mb-2 mt-4', className)} {...rest} />;
+        },
+        h4: function H4Wrapper({ className, ...rest }: ComponentProps<'h4'>) {
+          return <H4 className={cn('mb-1 mt-3', className)} {...rest} />;
+        },
       },
     });
   const content = processor.processSync(post?.content).result;

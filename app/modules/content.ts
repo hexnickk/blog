@@ -57,7 +57,7 @@ export namespace ContentModule {
       }),
     );
 
-    posts.sort((a, b) => a.date.getTime() - b.date.getTime());
+    posts.sort((a, b) => b.date < a.date ? -1 : 1);
 
     return posts;
   }

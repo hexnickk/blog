@@ -16,10 +16,6 @@ export function Layout({ children, className, ...rest }: LayoutProps) {
       <Header />
 
       <main className="flex-1">{children}</main>
-
-      <footer className="mt-auto text-center text-sm text-muted-foreground py-4">
-        &copy; {new Date().getFullYear()} Nick K. All rights reserved.
-      </footer>
     </div>
   );
 }

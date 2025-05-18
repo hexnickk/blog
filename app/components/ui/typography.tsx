@@ -70,7 +70,7 @@ export type PProps = ComponentProps<"p">;
 export function P({ className, children, ...props }: PProps) {
   return (
     <p
-      className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}
+      className={cn("leading-7 [&:not(:last-child)]:mb-3", className)}
       {...props}
     >
       {children}

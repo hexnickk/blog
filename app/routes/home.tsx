@@ -1,7 +1,7 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
 import { ContentModule } from "app/modules/content";
-import { H1 } from "app/components/ui/typography";
+import { H1, P } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 
 export function meta({}: Route.MetaArgs) {
@@ -21,7 +21,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <Layout>
-      <H1 className="text-center mb-4">Hi, I'm Nick K!</H1>
+      <H1 className="text-center mb-4">Hi 👋</H1>
+
+      <P className="mb-4">
+        I'm Nick, a software engineer, who loves diving deep into all sorts of topics. Welcome abroad!
+      </P>
 
       <div className="flex-1 flex flex-col gap-4">
         {posts.map((post) => (
