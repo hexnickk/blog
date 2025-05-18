@@ -1,18 +1,19 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
-import { ContentModule } from "app/modules/content";
+import { Content } from "app/modules/content";
 import { H1, P } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
+import { Config } from "app/modules/config";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Nick K blog" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: Config.siteName },
+    { name: "description", content: Config.siteDescription },
   ];
 }
 
 export async function loader({}: Route.LoaderArgs) {
-  const posts = await ContentModule.listAll();
+  const posts = await Content.listAll();
   return { posts };
 }
 
@@ -24,7 +25,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <H1 className="text-center mb-4">Hi 👋</H1>
 
       <P className="mb-4">
-        I'm Nick, a software engineer, who loves diving deep into all sorts of topics. Welcome abroad!
+        {Config.siteDescription}
       </P>
 
       <div className="flex-1 flex flex-col gap-4">

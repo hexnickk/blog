@@ -9,6 +9,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Env } from "./modules/env";
+import { Config } from "./modules/config";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,6 +31,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:site_name" content={Config.siteName} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={Env.HOST_URL} />
+        <meta property="og:title" content={Config.siteName} />
+        <meta property="og:description" content={Config.siteDescription} />
+        {/* TODO: upload image */}
+        <meta property="og:image" content={`${Env.HOST_URL}/og-image.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={Config.siteName} />
+        <meta name="twitter:description" content={Config.siteDescription} />
+        {/* TODO: upload image */}
+        <meta name="twitter:image" content={`${Env.HOST_URL}/og-image.png`} />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={Config.siteName}
+          href={`${Env.HOST_URL}/rss.xml`}
+        />
         <Meta />
         <Links />
       </head>

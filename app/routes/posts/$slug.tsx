@@ -1,24 +1,26 @@
-import { ContentModule } from "app/modules/content";
+import { Content } from "app/modules/content";
 import type { Route } from "./+types/$slug";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
 import React, { Fragment, type ComponentProps } from "react";
-import { H1, H2, H3, H4 } from "app/components/ui/typography";
+import { H1, H2, H3, H4, P } from "app/components/ui/typography";
 import { jsx, jsxs } from "react/jsx-runtime";
 import { Header } from "app/components/header";
 import { cn } from "app/lib/utils";
+import { Link } from "app/components/ui/link";
+import { Config } from "app/modules/config";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Nick K blog" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: Config.siteName },
+    { name: "description", content: Config.siteDescription },
   ];
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const post = await ContentModule.getPost(params.slug);
+  const post = await Content.getPost(params.slug);
 
   return {
     post,
@@ -36,18 +38,20 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
       jsx,
       jsxs,
       components: {
-        h1: function H1Wrapper({ className, ...rest }: ComponentProps<'h1'>) {
-          return <H1 className={cn('mb-4 mt-6', className)} {...rest} />;
+        h1: function H1Wrapper({ className, ...rest }: ComponentProps<"h1">) {
+          return <H1 className={cn("mb-4 mt-6", className)} {...rest} />;
         },
-        h2: function H2Wrapper({ className, ...rest }: ComponentProps<'h2'>) {
-          return <H2 className={cn('mb-3 mt-5', className)} {...rest} />;
+        h2: function H2Wrapper({ className, ...rest }: ComponentProps<"h2">) {
+          return <H2 className={cn("mb-3 mt-5", className)} {...rest} />;
         },
-        h3: function H3Wrapper({ className, ...rest }: ComponentProps<'h3'>) {
-          return <H3 className={cn('mb-2 mt-4', className)} {...rest} />;
+        h3: function H3Wrapper({ className, ...rest }: ComponentProps<"h3">) {
+          return <H3 className={cn("mb-2 mt-4", className)} {...rest} />;
         },
-        h4: function H4Wrapper({ className, ...rest }: ComponentProps<'h4'>) {
-          return <H4 className={cn('mb-1 mt-3', className)} {...rest} />;
+        h4: function H4Wrapper({ className, ...rest }: ComponentProps<"h4">) {
+          return <H4 className={cn("mb-1 mt-3", className)} {...rest} />;
         },
+        a: Link,
+        p: P,
       },
     });
   const content = processor.processSync(post?.content).result;

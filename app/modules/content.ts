@@ -5,7 +5,7 @@ import { Struct } from "app/lib/struct";
 import { z } from "zod";
 import { read } from "to-vfile";
 
-export namespace ContentModule {
+export namespace Content {
   export class Post extends Struct {
     declare slug: string;
     declare draft: boolean;
@@ -57,7 +57,7 @@ export namespace ContentModule {
       }),
     );
 
-    posts.sort((a, b) => b.date < a.date ? -1 : 1);
+    posts.sort((a, b) => (b.date > a.date ? -1 : 1));
 
     return posts;
   }

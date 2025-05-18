@@ -1,10 +1,10 @@
-import type { ContentModule } from "app/modules/content";
+import type { Content } from "app/modules/content";
 import type { ComponentProps } from "react";
 import { Link } from "react-router";
 import { H3, Muted, P } from "./ui/typography";
 
 export type PostPreviewProps = ComponentProps<"a"> & {
-  post: ContentModule.Post;
+  post: Content.Post;
 };
 
 export function PostPreview({ post, ...rest }: PostPreviewProps) {
