@@ -1,131 +1,69 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkGfm from "remark-gfm";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
 import { matter } from "vfile-matter";
-import { Struct } from "~/lib/struct";
+import { Struct } from "app/lib/struct";
 import { z } from "zod";
+import { read } from "to-vfile";
 
 export namespace ContentModule {
-  export class ContentBase extends Struct {
-    declare type: string;
+  export class Post extends Struct {
     declare slug: string;
+    declare draft: boolean;
     declare title: string;
+    declare description: string;
     declare date: Date;
+    declare content: string;
+
+    static _validator = z.object({
+      slug: z.string(),
+      draft: z.boolean(),
+      title: z.string(),
+      description: z.string(),
+      date: z
+        .string()
+        .regex(
+          /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?(Z|[+-]\d{2}:\d{2})?)?$/,
+          "Invalid ISO date format",
+        )
+        .transform((dateStr) => new Date(dateStr)),
+      content: z.string(),
+    });
+
+    static fromRaw(raw: unknown) {
+      const parsed = Post._validator.parse(raw);
+      return Post.create(parsed);
+    }
   }
 
-  export const ContentBaseValidtor = z.object({
-    type: z.string(),
-    slug: z.string(),
-    title: z.string(),
-    date: z
-      .string()
-      .regex(
-        /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?(Z|[+-]\d{2}:\d{2})?)?$/,
-        "Invalid ISO date format",
-      )
-      .transform((dateStr) => new Date(dateStr)),
-  });
-
-  export class LinkContent extends ContentBase {
-    declare type: "link";
-    declare url: string;
-  }
-
-  export const LinkContentValidator = z.object({
-    ...ContentBaseValidtor.shape,
-    type: z.literal("link"),
-    url: z.string(),
-  });
-
-  export class PostContent extends ContentBase {
-    declare type: "post";
-    declare htmlContent: string;
-  }
-
-  export const PostContentValidator = z.object({
-    ...ContentBaseValidtor.shape,
-    type: z.literal("post"),
-    htmlContent: z.string(),
-  });
-
-  export async function listAll() {
+  export async function listAll(): Promise<Post[]> {
     const contentDir = path.join(process.cwd(), "content");
-    const filenames = await fs.readdir(contentDir);
-    const mdFiles = filenames.filter((filename) => filename.endsWith(".md"));
-
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkFrontmatter, ["yaml"])
-      .use(function myUnifiedPluginHandlingYamlMatter() {
-        /**
-         * Transform.
-         *
-         * @param {Node} tree
-         *   Tree.
-         * @param {VFile} file
-         *   File.
-         * @returns {undefined}
-         *   Nothing.
-         */
-        return function (tree, file) {
-          matter(file);
-        };
-      })
-      .use(remarkGfm)
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeStringify);
-
-    const contentData = await Promise.all(
-      mdFiles.map(async (filename) => {
+    const filenames = await fs.readdir(contentDir, { recursive: true });
+    const files = filenames.filter((filename) => filename.endsWith(".md"));
+    const posts = await Promise.all(
+      files.map(async (filename) => {
         const filePath = path.join(contentDir, filename);
-        const fileContent = await fs.readFile(filePath, "utf-8");
+        const vFile = await read(filePath);
+        matter(vFile, { strip: true });
+        const metadata = vFile.data.matter as any;
 
-        const vFile = await processor.process(fileContent);
-        const frontmatter = vFile.data.matter || {};
-        const htmlContent = String(vFile);
-
-        const slug = filename.replace(/\.md$/, "");
-
-        const content = ContentBaseValidtor.parse({
-          slug,
-          ...frontmatter,
+        return Post.fromRaw({
+          slug: filename.replace(/\.md$/, ""),
+          draft: metadata.draft!,
+          title: metadata.title,
+          description: metadata.description,
+          date: metadata.date,
+          content: String(vFile),
         });
-
-        switch (content.type) {
-          case "link":
-            return LinkContentValidator.parse({
-              slug,
-              ...frontmatter,
-            });
-          case "post":
-            return PostContentValidator.parse({
-              slug,
-              ...frontmatter,
-              htmlContent,
-            });
-          default:
-            throw new Error(`Unknown content type: ${content.type}`);
-        }
       }),
     );
 
-    contentData.sort((a, b) => a.date.getTime() - b.date.getTime());
+    posts.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    const posts = contentData.filter(
-      (content) => content.type === "post",
-    ) as PostContent[];
-    const links = contentData.filter(
-      (content) => content.type === "link",
-    ) as LinkContent[];
+    return posts;
+  }
 
-    return {
-      posts,
-      links,
-    };
+  export async function getPost(slug: string): Promise<Post | undefined> {
+    const posts = await listAll();
+    return posts.find((post) => post.slug === slug);
   }
 }
