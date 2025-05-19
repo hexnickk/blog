@@ -5,10 +5,13 @@ import {
   type LinkProps as RouterLinkProps,
 } from "react-router";
 
-const linkVariants = cva("text-blue-700 hover:underline", {
-  variants: {},
-  defaultVariants: {},
-});
+const linkVariants = cva(
+  "text-foreground/80 underline underline-offset-4 decoration-dotted hover:text-foreground",
+  {
+    variants: {},
+    defaultVariants: {},
+  },
+);
 
 export type LinkProps = RouterLinkProps & VariantProps<typeof linkVariants>;
 

@@ -7,7 +7,6 @@ import rehypeReact from "rehype-react";
 import React, { Fragment, type ComponentProps } from "react";
 import { H1, H2, H3, H4, P } from "app/components/ui/typography";
 import { jsx, jsxs } from "react/jsx-runtime";
-import { Header } from "app/components/header";
 import { cn } from "app/lib/utils";
 import { Link } from "app/components/ui/link";
 import { Config } from "app/modules/config";
@@ -58,7 +57,6 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="min-h-screen m-auto max-w-2xl px-4 py-4 flex flex-col">
-      <Header />
       <div>{content}</div>
     </div>
   );

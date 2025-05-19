@@ -1,9 +1,12 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
 import { Content } from "app/modules/content";
-import { H1, P } from "app/components/ui/typography";
+import { H2, type H2Props } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 import { Config } from "app/modules/config";
+import { Link } from "app/components/ui/link";
+import type { ComponentProps } from "react";
+import { cn } from "app/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,21 +20,51 @@ export async function loader({}: Route.LoaderArgs) {
   return { posts };
 }
 
+function Section({ className, ...rest }: ComponentProps<"section">) {
+  return <section className={cn("gap-4", className)} {...rest} />;
+}
+
+function SectionHeader({ className, ...rest }: H2Props) {
+  return <H2 className={cn("text-secondary", className)} {...rest} />;
+}
+
+function SectionContent({ className, ...rest }: ComponentProps<"div">) {
+  return <div className={cn("ml-4", className)} {...rest} />;
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { posts } = loaderData;
 
   return (
     <Layout>
-      <H1 className="text-center mb-4">Hi 👋</H1>
+      <div className="flex flex-col gap-6">
+        <Section>
+          <SectionHeader>Name</SectionHeader>
+          <SectionContent>
+            Hi 👋 I'm <span className="text-primary">Nick K</span> a software
+            engineer, who dives deep into the unknown. Welcome to the journey!
+          </SectionContent>
+        </Section>
 
-      <P className="mb-4">
-        {Config.siteDescription}
-      </P>
+        <Section>
+          <SectionHeader>Socials</SectionHeader>
+          <SectionContent>
+            Let's be friends on{" "}
+            <Link to="https://x.com/hexnickk">Twitter (en)</Link> or{" "}
+            <Link to="https://x.com/kozlovzxc">Twitter (ru)</Link>.
+          </SectionContent>
+        </Section>
 
-      <div className="flex-1 flex flex-col gap-4">
-        {posts.map((post) => (
-          <PostPreview key={post.slug} post={post} />
-        ))}
+        <Section>
+          <SectionHeader>Posts</SectionHeader>
+          <SectionContent>
+            <div className="flex-1 flex flex-col gap-4">
+              {posts.map((post) => (
+                <PostPreview key={post.slug} post={post} />
+              ))}
+            </div>
+          </SectionContent>
+        </Section>
       </div>
     </Layout>
   );
