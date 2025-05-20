@@ -14,7 +14,7 @@ export function Layout({ children, className, ...rest }: LayoutProps) {
     >
       {/* header */}
       <main className="flex-1">{children}</main>
-      {/* footer */}
+      {/* <footer></footer> */}
     </div>
   );
 }

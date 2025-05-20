@@ -10,6 +10,7 @@ export namespace Content {
     declare type: "post";
     declare slug: string;
     declare draft: boolean;
+    declare icon?: string;
     declare title: string;
     declare description: string;
     declare date: Date;
@@ -19,6 +20,7 @@ export namespace Content {
       type: z.literal("post"),
       slug: z.string(),
       draft: z.boolean(),
+      icon: z.string().optional(),
       title: z.string(),
       description: z.string(),
       date: z
@@ -92,6 +94,7 @@ export namespace Content {
               slug: filename.replace(/\.md$/, ""),
               type: metadata.type,
               draft: metadata.draft!,
+              icon: metadata.icon ?? "PencilLine",
               title: metadata.title,
               description: metadata.description,
               date: metadata.date,

@@ -1,7 +1,8 @@
 import type { Content } from "app/modules/content";
 import { useEffect, useState, type ComponentProps } from "react";
 import { Link } from "react-router";
-import { H4, Muted, P } from "./ui/typography";
+import { H3, Muted, P } from "./ui/typography";
+import { icons } from "lucide-react";
 
 export type PostPreviewProps = ComponentProps<"a"> & {
   post: Content.Post;
@@ -14,10 +15,18 @@ export function PostPreview({ post, ...rest }: PostPreviewProps) {
     setDate(post.date);
   }, [post.date]);
 
+  const Icon = icons[post.icon as keyof typeof icons];
+
   return (
     <Link to={`/posts/${post.slug}`} className="group" {...rest}>
       <div className="flex items-center justify-between mb-2">
-        <H4 className="group-hover:underline">{post.title}</H4>
+        <div className="flex items-baseline">
+          <Icon size="1em" className="inline" />
+          &nbsp;
+          <H3 className="text-foreground/80 group-hover:text-foreground underline underline-offset-4 decoration-dotted">
+            {post.title}
+          </H3>
+        </div>
         <Muted>{date != null && date.toLocaleDateString()}</Muted>
       </div>
       <div className="ml-4">

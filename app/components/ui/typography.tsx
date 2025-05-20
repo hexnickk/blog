@@ -6,10 +6,7 @@ export type H1Props = ComponentProps<"h1">;
 export function H1({ className, ...props }: H1Props) {
   return (
     <h1
-      className={cn(
-        "scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl",
-        className,
-      )}
+      className={cn("scroll-m-20 text-2xl font-bold lg:text-3xl", className)}
       {...props}
     >
       {props.children}
@@ -23,7 +20,7 @@ export function H2({ className, children, ...props }: H2Props) {
   return (
     <h2
       className={cn(
-        "scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 border-b pb-2 text-xl font-medium first:mt-0",
         className,
       )}
       {...props}
@@ -37,13 +34,7 @@ export type H3Props = ComponentProps<"h3">;
 
 export function H3({ className, children, ...props }: H3Props) {
   return (
-    <h3
-      className={cn(
-        "scroll-m-20 text-lg font-semibold tracking-tight",
-        className,
-      )}
-      {...props}
-    >
+    <h3 className={cn("scroll-m-20 text-lg font-medium", className)} {...props}>
       {children}
     </h3>
   );
@@ -54,10 +45,7 @@ export type H4Props = ComponentProps<"h4">;
 export function H4({ className, children, ...props }: H4Props) {
   return (
     <h4
-      className={cn(
-        "scroll-m-20 text-base font-semibold tracking-tight",
-        className,
-      )}
+      className={cn("scroll-m-20 text-base font-medium", className)}
       {...props}
     >
       {children}

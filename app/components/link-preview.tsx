@@ -1,7 +1,7 @@
 import type { Content } from "app/modules/content";
 import { useEffect, useState, type ComponentProps } from "react";
 import { Link } from "react-router";
-import { H4, Muted, P } from "./ui/typography";
+import { H3, Muted, P } from "./ui/typography";
 import { ExternalLink } from "lucide-react";
 
 export type LinkPreviewProps = ComponentProps<"a"> & {
@@ -17,11 +17,14 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
 
   return (
     <Link to={link.href} className="group" target="_blank" {...rest}>
-      <div className="flex items-center justify-between mb-2">
-        <H4 className="group-hover:underline flex items-center gap-1">
-          <ExternalLink size="1em" />
-          {link.title}
-        </H4>
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex items-baseline">
+          <ExternalLink size="1em" className="inline" />
+          &nbsp;
+          <H3 className="text-foreground/80 group-hover:text-foreground underline underline-offset-4 decoration-dotted">
+            {link.title}
+          </H3>
+        </div>
         <Muted>{date != null && date.toLocaleDateString()}</Muted>
       </div>
       {link.description && (

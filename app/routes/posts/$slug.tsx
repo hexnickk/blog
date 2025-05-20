@@ -10,6 +10,7 @@ import { jsx, jsxs } from "react/jsx-runtime";
 import { cn } from "app/lib/utils";
 import { Link } from "app/components/ui/link";
 import { Config } from "app/modules/config";
+import { ArrowLeft } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -57,6 +58,9 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="min-h-screen m-auto max-w-2xl px-4 py-4 flex flex-col">
+      <Link to="/" className="flex items-center">
+        <ArrowLeft size="1em" /> Go back
+      </Link>
       <div>{content}</div>
     </div>
   );

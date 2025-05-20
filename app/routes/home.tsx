@@ -5,7 +5,7 @@ import { H2, type H2Props } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 import { Config } from "app/modules/config";
 import { Link } from "app/components/ui/link";
-import type { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 import { cn } from "app/lib/utils";
 import { LinkPreview } from "app/components/link-preview";
 
@@ -51,8 +51,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <SectionHeader>Socials</SectionHeader>
           <SectionContent>
             Let's be friends on{" "}
-            <Link to="https://x.com/hexnickk">Twitter (en)</Link> or{" "}
-            <Link to="https://x.com/kozlovzxc">Twitter (ru)</Link>.
+            <Link to="https://x.com/hexnickk" target="_blank">
+              Twitter (en)
+            </Link>{" "}
+            or{" "}
+            <Link to="https://x.com/kozlovzxc" target="_blank">
+              Twitter (ru)
+            </Link>
+            .
           </SectionContent>
         </Section>
 
@@ -60,16 +66,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <SectionHeader>Posts</SectionHeader>
           <SectionContent>
             <div className="flex-1 flex flex-col gap-4">
-              {entries.map((entries) => (
-                <>
-                  {entries.type === "post" && (
+              {entries.map(
+                (entries) =>
+                  (entries.type === "post" && (
                     <PostPreview key={entries.slug} post={entries} />
-                  )}
-                  {entries.type === "link" && (
+                  )) ||
+                  (entries.type === "link" && (
                     <LinkPreview key={entries.href} link={entries} />
-                  )}
-                </>
-              ))}
+                  )),
+              )}
             </div>
           </SectionContent>
         </Section>
