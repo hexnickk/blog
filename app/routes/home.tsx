@@ -7,6 +7,7 @@ import { Config } from "app/modules/config";
 import { Link } from "app/components/ui/link";
 import type { ComponentProps } from "react";
 import { cn } from "app/lib/utils";
+import { LinkPreview } from "app/components/link-preview";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -16,8 +17,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader({}: Route.LoaderArgs) {
-  const posts = await Content.listAll();
-  return { posts };
+  const entries = await Content.listAll();
+  return { entries };
 }
 
 function Section({ className, ...rest }: ComponentProps<"section">) {
@@ -33,7 +34,7 @@ function SectionContent({ className, ...rest }: ComponentProps<"div">) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { posts } = loaderData;
+  const { entries } = loaderData;
 
   return (
     <Layout>
@@ -59,8 +60,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <SectionHeader>Posts</SectionHeader>
           <SectionContent>
             <div className="flex-1 flex flex-col gap-4">
-              {posts.map((post) => (
-                <PostPreview key={post.slug} post={post} />
+              {entries.map((entries) => (
+                <>
+                  {entries.type === "post" && (
+                    <PostPreview key={entries.slug} post={entries} />
+                  )}
+                  {entries.type === "link" && (
+                    <LinkPreview key={entries.href} link={entries} />
+                  )}
+                </>
               ))}
             </div>
           </SectionContent>
