@@ -6,7 +6,10 @@ export type H1Props = ComponentProps<"h1">;
 export function H1({ className, ...props }: H1Props) {
   return (
     <h1
-      className={cn("scroll-m-20 text-2xl font-bold lg:text-3xl", className)}
+      className={cn(
+        "text-foreground mb-4 scroll-m-20 text-2xl font-bold md:text-3xl",
+        className,
+      )}
       {...props}
     >
       {props.children}
@@ -20,7 +23,7 @@ export function H2({ className, children, ...props }: H2Props) {
   return (
     <h2
       className={cn(
-        "scroll-m-20 border-b pb-2 text-xl font-medium first:mt-0",
+        "text-foreground mb-3 scroll-m-20 text-xl font-medium first:mt-0",
         className,
       )}
       {...props}
@@ -34,7 +37,13 @@ export type H3Props = ComponentProps<"h3">;
 
 export function H3({ className, children, ...props }: H3Props) {
   return (
-    <h3 className={cn("scroll-m-20 text-lg font-medium", className)} {...props}>
+    <h3
+      className={cn(
+        "text-foreground mb-2 scroll-m-20 text-lg font-medium",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h3>
   );
@@ -45,7 +54,10 @@ export type H4Props = ComponentProps<"h4">;
 export function H4({ className, children, ...props }: H4Props) {
   return (
     <h4
-      className={cn("scroll-m-20 text-base font-medium", className)}
+      className={cn(
+        "text-foreground scroll-m-20 text-base font-medium",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -58,7 +70,10 @@ export type PProps = ComponentProps<"p">;
 export function P({ className, children, ...props }: PProps) {
   return (
     <p
-      className={cn("leading-7 [&:not(:last-child)]:mb-3", className)}
+      className={cn(
+        "text-foreground leading-7 [&:not(:last-child)]:mb-3",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -71,7 +86,10 @@ export type BlockquoteProps = ComponentProps<"blockquote">;
 export function Blockquote({ className, children, ...props }: BlockquoteProps) {
   return (
     <blockquote
-      className={cn("mt-6 border-l-2 pl-6 italic", className)}
+      className={cn(
+        "border-border text-muted-foreground mt-6 border-l-2 pl-6 italic",
+        className,
+      )}
       {...props}
     >
       {children}

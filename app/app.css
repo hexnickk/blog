@@ -47,32 +47,49 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.036 0 0); /* Near black, #0A0A0A */
-  --foreground: oklch(0.896 0 0); /* Light gray, #E0E0E0 */
-  --card: oklch(0.07 0 0); /* Slightly lighter than background */
+
+  /* Slightly gray black background */
+  --background: oklch(0.08 0.005 260); /* #141418 - Very dark gray-black */
+  --foreground: oklch(0.95 0.01 260); /* #f2f2f4 - Light foreground */
+
+  /* Cards with subtle elevation */
+  --card: oklch(0.12 0.01 260); /* #1e1e24 - Slightly lighter dark card */
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.8 0.2 150); /* Softer Green */
-  --primary-foreground: oklch(0.036 0 0); /* Dark text on green */
-  --secondary: oklch(0.712 0.148 283.6); /* Purple #A78BFA */
-  --secondary-foreground: oklch(0.95 0 0); /* Light text on purple */
-  --muted: oklch(0.15 0 0); /* Darker gray for muted elements */
-  --muted-foreground: oklch(0.6 0 0); /* Lighter gray for muted text */
+
+  /* Vibrant but professional primary */
+  --primary: oklch(0.7 0.15 190); /* #4facfe - Bright blue */
+  --primary-foreground: oklch(0.08 0.005 260);
+
+  /* Complementary secondary */
+  --secondary: oklch(0.68 0.12 320); /* #9c88ff - Soft purple */
+  --secondary-foreground: oklch(0.08 0.005 260);
+
+  /* Dark muted colors */
+  --muted: oklch(0.16 0.01 260); /* #28282e - Dark muted background */
+  --muted-foreground: oklch(0.65 0.02 260); /* #9999b8 - Readable muted text */
+
   --accent: var(--primary);
   --accent-foreground: var(--primary-foreground);
-  --destructive: oklch(0.65 0.23 25); /* A standard error red */
-  --destructive-foreground: oklch(0.95 0 0); /* Light text on red */
-  --border: oklch(0.125 0 0); /* Border #222222 */
-  --input: oklch(
-    0.1 0 0
-  ); /* Slightly lighter than border for input background */
-  --ring: oklch(0.8 0.2 150 / 0.5); /* Primary color with alpha for ring */
+
+  /* Accessible destructive color */
+  --destructive: oklch(0.65 0.18 25); /* #ff6b6b - Warm red */
+  --destructive-foreground: oklch(0.95 0.01 25);
+
+  /* Dark borders and inputs */
+  --border: oklch(0.25 0.01 260); /* #3d3d47 - Subtle dark borders */
+  --input: oklch(0.14 0.01 260); /* #242429 - Dark input background */
+  --ring: oklch(0.7 0.15 190 / 0.4); /* Primary ring with transparency */
+
+  /* Harmonious chart colors */
   --chart-1: var(--primary);
   --chart-2: var(--secondary);
-  --chart-3: oklch(0.7 0.22 155); /* Another green shade */
-  --chart-4: oklch(0.6 0.13 290); /* Another purple shade */
-  --chart-5: oklch(0.5 0 0); /* A mid-gray */
+  --chart-3: oklch(0.65 0.15 140); /* #50c878 - Emerald green */
+  --chart-4: oklch(0.72 0.18 80); /* #ffd700 - Golden yellow */
+  --chart-5: oklch(0.68 0.16 350); /* #ff69b4 - Hot pink */
+
+  /* Sidebar colors */
   --sidebar: var(--background);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -89,5 +106,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Dark gradient with slight gray tint */
+    background: linear-gradient(
+      135deg,
+      oklch(0.08 0.005 260) 0%,
+      oklch(0.1 0.008 270) 100%
+    );
+    min-height: 100vh;
   }
 }

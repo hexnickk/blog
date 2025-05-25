@@ -9,14 +9,14 @@ import { type ComponentProps } from "react";
 import { cn } from "app/lib/utils";
 import { LinkPreview } from "app/components/link-preview";
 
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: Config.siteName },
     { name: "description", content: Config.siteDescription },
   ];
 }
 
-export async function loader({ }: Route.LoaderArgs) {
+export async function loader({}: Route.LoaderArgs) {
   const entries = await Content.listAll();
   return { entries };
 }
@@ -38,11 +38,12 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <Layout>
-      <div className="flex flex-col gap-6">
+      <div className="relative flex flex-col gap-6">
         <Section>
           <SectionHeader>About</SectionHeader>
           <SectionContent>
-            <P>Hi 👋 I'm <span className="text-primary">Nick K</span> a software
+            <P>
+              Hi 👋 I'm <span className="text-primary">Nick K</span> a software
               engineer, who dives deep into the unknown. Welcome to the journey!
             </P>
             <P>
@@ -60,7 +61,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </Section>
 
         <Section>
-          <SectionHeader>Posts</SectionHeader>
+          <SectionHeader>Latest posts</SectionHeader>
           <SectionContent>
             <div className="flex flex-1 flex-col gap-4">
               {entries.map(

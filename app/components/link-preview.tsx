@@ -2,7 +2,6 @@ import type { Content } from "app/modules/content";
 import { useEffect, useState, type ComponentProps } from "react";
 import { Link } from "react-router";
 import { H3, Muted, P } from "./ui/typography";
-import { ExternalLink } from "lucide-react";
 
 export type LinkPreviewProps = ComponentProps<"a"> & {
   link: Content.Link;
@@ -19,8 +18,6 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
     <Link to={link.href} className="group" target="_blank" {...rest}>
       <div className="mb-2 flex items-start justify-between">
         <div className="flex items-baseline">
-          <ExternalLink size="1em" className="inline" />
-          &nbsp;
           <H3 className="text-foreground/80 group-hover:text-foreground underline decoration-dotted underline-offset-4">
             {link.title}
           </H3>

@@ -11,6 +11,7 @@ import { cn } from "app/lib/utils";
 import { Link } from "app/components/ui/link";
 import { Config } from "app/modules/config";
 import { ArrowLeft } from "lucide-react";
+import { Layout } from "app/components/layout";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -57,11 +58,11 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
   const content = processor.processSync(post?.content).result;
 
   return (
-    <div className="m-auto flex min-h-screen max-w-2xl flex-col px-4 py-4">
+    <Layout>
       <Link to="/" className="flex items-center">
         <ArrowLeft size="1em" /> Go back
       </Link>
       <div>{content}</div>
-    </div>
+    </Layout>
   );
 }
