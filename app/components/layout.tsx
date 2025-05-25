@@ -7,7 +7,7 @@ export function Layout({ children, className, ...rest }: LayoutProps) {
   return (
     <div
       className={cn(
-        "m-auto flex min-h-screen max-w-3xl flex-col px-4 py-8 backdrop-blur-[2px]",
+        "m-auto flex min-h-screen max-w-3xl flex-col px-4 py-16 backdrop-blur-[3px]",
         className,
       )}
       {...rest}

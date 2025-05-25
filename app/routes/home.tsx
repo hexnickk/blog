@@ -1,7 +1,7 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
 import { Content } from "app/modules/content";
-import { H2, P, type H2Props } from "app/components/ui/typography";
+import { H2, H3, P, type H2Props } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 import { Config } from "app/modules/config";
 import { Link } from "app/components/ui/link";
@@ -25,10 +25,6 @@ function Section({ className, ...rest }: ComponentProps<"section">) {
   return <section className={cn("gap-4", className)} {...rest} />;
 }
 
-function SectionHeader({ className, ...rest }: H2Props) {
-  return <H2 className={cn("text-secondary", className)} {...rest} />;
-}
-
 function SectionContent({ className, ...rest }: ComponentProps<"div">) {
   return <div className={cn("ml-4", className)} {...rest} />;
 }
@@ -40,7 +36,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <Layout>
       <div className="relative flex flex-col gap-6">
         <Section>
-          <SectionHeader>About</SectionHeader>
+          <H2>About</H2>
           <SectionContent>
             <P>
               Hi 👋 I'm <span className="text-primary">Nick K</span> a software
@@ -61,7 +57,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </Section>
 
         <Section>
-          <SectionHeader>Latest posts</SectionHeader>
+          <H2>Latest posts</H2>
           <SectionContent>
             <div className="flex flex-1 flex-col gap-4">
               {entries.map(
