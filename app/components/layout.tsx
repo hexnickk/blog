@@ -7,7 +7,7 @@ export function Layout({ children, className, ...rest }: LayoutProps) {
   return (
     <div
       className={cn(
-        "min-h-screen m-auto max-w-3xl px-4 py-8 flex flex-col",
+        "m-auto flex min-h-screen max-w-3xl flex-col px-4 py-8",
         className,
       )}
       {...rest}

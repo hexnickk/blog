@@ -1,7 +1,7 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
 import { Content } from "app/modules/content";
-import { H2, type H2Props } from "app/components/ui/typography";
+import { H2, P, type H2Props } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 import { Config } from "app/modules/config";
 import { Link } from "app/components/ui/link";
@@ -9,14 +9,14 @@ import { type ComponentProps } from "react";
 import { cn } from "app/lib/utils";
 import { LinkPreview } from "app/components/link-preview";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: Config.siteName },
     { name: "description", content: Config.siteDescription },
   ];
 }
 
-export async function loader({}: Route.LoaderArgs) {
+export async function loader({ }: Route.LoaderArgs) {
   const entries = await Content.listAll();
   return { entries };
 }
@@ -40,32 +40,29 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <Layout>
       <div className="flex flex-col gap-6">
         <Section>
-          <SectionHeader>Name</SectionHeader>
+          <SectionHeader>About</SectionHeader>
           <SectionContent>
-            Hi 👋 I'm <span className="text-primary">Nick K</span> a software
-            engineer, who dives deep into the unknown. Welcome to the journey!
-          </SectionContent>
-        </Section>
-
-        <Section>
-          <SectionHeader>Socials</SectionHeader>
-          <SectionContent>
-            Let's be friends on{" "}
-            <Link to="https://x.com/hexnickk" target="_blank">
-              Twitter (en)
-            </Link>{" "}
-            or{" "}
-            <Link to="https://x.com/kozlovzxc" target="_blank">
-              Twitter (ru)
-            </Link>
-            .
+            <P>Hi 👋 I'm <span className="text-primary">Nick K</span> a software
+              engineer, who dives deep into the unknown. Welcome to the journey!
+            </P>
+            <P>
+              Let's be friends on{" "}
+              <Link to="https://x.com/hexnickk" target="_blank">
+                Twitter (en)
+              </Link>{" "}
+              or{" "}
+              <Link to="https://x.com/kozlovzxc" target="_blank">
+                Twitter (ru)
+              </Link>
+              .
+            </P>
           </SectionContent>
         </Section>
 
         <Section>
           <SectionHeader>Posts</SectionHeader>
           <SectionContent>
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex flex-1 flex-col gap-4">
               {entries.map(
                 (entries) =>
                   (entries.type === "post" && (

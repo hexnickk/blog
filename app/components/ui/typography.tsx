@@ -83,7 +83,7 @@ export type MutedProps = ComponentProps<"p">;
 
 export function Muted({ className, children, ...props }: MutedProps) {
   return (
-    <p className={cn("text-sm text-muted-foreground", className)} {...props}>
+    <p className={cn("text-muted-foreground text-sm", className)} {...props}>
       {children}
     </p>
   );

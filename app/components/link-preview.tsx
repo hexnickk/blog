@@ -17,11 +17,11 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
 
   return (
     <Link to={link.href} className="group" target="_blank" {...rest}>
-      <div className="flex items-start justify-between mb-2">
+      <div className="mb-2 flex items-start justify-between">
         <div className="flex items-baseline">
           <ExternalLink size="1em" className="inline" />
           &nbsp;
-          <H3 className="text-foreground/80 group-hover:text-foreground underline underline-offset-4 decoration-dotted">
+          <H3 className="text-foreground/80 group-hover:text-foreground underline decoration-dotted underline-offset-4">
             {link.title}
           </H3>
         </div>

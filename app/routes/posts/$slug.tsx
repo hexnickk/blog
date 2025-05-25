@@ -39,16 +39,16 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
       jsxs,
       components: {
         h1: function H1Wrapper({ className, ...rest }: ComponentProps<"h1">) {
-          return <H1 className={cn("mb-4 mt-6", className)} {...rest} />;
+          return <H1 className={cn("mt-6 mb-4", className)} {...rest} />;
         },
         h2: function H2Wrapper({ className, ...rest }: ComponentProps<"h2">) {
-          return <H2 className={cn("mb-3 mt-5", className)} {...rest} />;
+          return <H2 className={cn("mt-5 mb-3", className)} {...rest} />;
         },
         h3: function H3Wrapper({ className, ...rest }: ComponentProps<"h3">) {
-          return <H3 className={cn("mb-2 mt-4", className)} {...rest} />;
+          return <H3 className={cn("mt-4 mb-2", className)} {...rest} />;
         },
         h4: function H4Wrapper({ className, ...rest }: ComponentProps<"h4">) {
-          return <H4 className={cn("mb-1 mt-3", className)} {...rest} />;
+          return <H4 className={cn("mt-3 mb-1", className)} {...rest} />;
         },
         a: Link,
         p: P,
@@ -57,7 +57,7 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
   const content = processor.processSync(post?.content).result;
 
   return (
-    <div className="min-h-screen m-auto max-w-2xl px-4 py-4 flex flex-col">
+    <div className="m-auto flex min-h-screen max-w-2xl flex-col px-4 py-4">
       <Link to="/" className="flex items-center">
         <ArrowLeft size="1em" /> Go back
       </Link>

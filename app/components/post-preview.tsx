@@ -19,11 +19,11 @@ export function PostPreview({ post, ...rest }: PostPreviewProps) {
 
   return (
     <Link to={`/posts/${post.slug}`} className="group" {...rest}>
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-baseline">
           <Icon size="1em" className="inline" />
           &nbsp;
-          <H3 className="text-foreground/80 group-hover:text-foreground underline underline-offset-4 decoration-dotted">
+          <H3 className="text-foreground/80 group-hover:text-foreground underline decoration-dotted underline-offset-4">
             {post.title}
           </H3>
         </div>
