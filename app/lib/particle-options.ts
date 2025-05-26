@@ -1,9 +1,11 @@
-export const particlesOptions = {
+import type { ISourceOptions } from "@tsparticles/engine";
+
+export const particlesOptions: ISourceOptions = {
   fpsLimit: 120,
   particles: {
-    color: {
-      value: "#ffffff",
-    },
+    // color: {
+    //   value: "#ffffff",
+    // },
     move: {
       enable: true,
       speed: {
@@ -12,22 +14,30 @@ export const particlesOptions = {
       },
     },
     number: {
-      value: 160,
+      value: 128,
     },
     opacity: {
       value: {
         min: 0.1,
-        max: 2,
+        max: 1,
       },
       animation: {
         enable: true,
         speed: 1,
       },
     },
+    shape: {
+      type: "emoji",
+      options: {
+        emoji: {
+          value: "👾"
+        }
+      }
+    },
     size: {
       value: {
-        min: 1,
-        max: 3,
+        min: 2,
+        max: 12,
       },
     },
   },
