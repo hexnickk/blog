@@ -48,46 +48,49 @@
 :root {
   --radius: 0.625rem;
 
-  /* Slightly gray black background */
-  --background: oklch(0.08 0.005 260); /* #141418 - Very dark gray-black */
-  --foreground: oklch(0.95 0.01 260); /* #f2f2f4 - Light foreground */
+  /* Minimal theme - white background, black text */
+  --background: #ffffff;
+  --foreground: #000000;
 
-  /* Cards with subtle elevation */
-  --card: oklch(0.12 0.01 260); /* #1e1e24 - Slightly lighter dark card */
+  /* Cards same as background */
+  --card: var(--background);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
 
-  /* Vibrant but professional primary */
-  --primary: oklch(0.7 0.15 190); /* #4facfe - Bright blue */
-  --primary-foreground: oklch(0.08 0.005 260);
+  /* Custom primary color from RGB 245, 190, 87 */
+  --primary: rgb(245, 190, 87);
+  --primary-foreground: #000000;
 
-  /* Complementary secondary */
-  --secondary: oklch(0.68 0.12 320); /* #9c88ff - Soft purple */
-  --secondary-foreground: oklch(0.08 0.005 260);
+  /* Standard blue for links */
+  --links: #0000ee;
 
-  /* Dark muted colors */
-  --muted: oklch(0.16 0.01 260); /* #28282e - Dark muted background */
-  --muted-foreground: oklch(0.65 0.02 260); /* #9999b8 - Readable muted text */
+  /* Minimal secondary */
+  --secondary: #f5f5f5;
+  --secondary-foreground: var(--foreground);
 
-  --accent: var(--primary);
-  --accent-foreground: var(--primary-foreground);
+  /* Light gray for muted content */
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
 
-  /* Accessible destructive color */
-  --destructive: oklch(0.65 0.18 25); /* #ff6b6b - Warm red */
-  --destructive-foreground: oklch(0.95 0.01 25);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
 
-  /* Dark borders and inputs */
-  --border: oklch(0.25 0.01 260); /* #3d3d47 - Subtle dark borders */
-  --input: oklch(0.14 0.01 260); /* #242429 - Dark input background */
-  --ring: oklch(0.7 0.15 190 / 0.4); /* Primary ring with transparency */
+  /* Standard red for errors */
+  --destructive: #ff0000;
+  --destructive-foreground: #ffffff;
 
-  /* Harmonious chart colors */
+  /* Light borders */
+  --border: #e0e0e0;
+  --input: var(--background);
+  --ring: var(--primary);
+
+  /* Minimal chart colors */
   --chart-1: var(--primary);
-  --chart-2: var(--secondary);
-  --chart-3: oklch(0.65 0.15 140); /* #50c878 - Emerald green */
-  --chart-4: oklch(0.72 0.18 80); /* #ffd700 - Golden yellow */
-  --chart-5: oklch(0.68 0.16 350); /* #ff69b4 - Hot pink */
+  --chart-2: #008000;
+  --chart-3: #ffa500;
+  --chart-4: #800080;
+  --chart-5: #ff69b4;
 
   /* Sidebar colors */
   --sidebar: var(--background);
@@ -105,13 +108,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-    /* Dark gradient with slight gray tint */
-    background: linear-gradient(
-      135deg,
-      oklch(0.08 0.005 260) 0%,
-      oklch(0.1 0.008 270) 100%
-    );
+    @apply bg-background text-foreground text-lg;
     min-height: 100vh;
   }
 }

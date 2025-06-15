@@ -39,7 +39,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <H2>About</H2>
           <SectionContent>
             <P>
-              Hi 👋 I'm <span className="text-primary">Nick K</span> a software
+              Hi 👋 I'm <strong>Nick K</strong> a software
               engineer, who dives deep into the unknown. Welcome to the journey!
             </P>
             <P>
