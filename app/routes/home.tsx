@@ -17,7 +17,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader({}: Route.LoaderArgs) {
-  const entries = await Content.listAll();
+  const entries = await Content.listPublic();
   return { entries };
 }
 
@@ -39,8 +39,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <H2>About</H2>
           <SectionContent>
             <P>
-              Hi 👋 I'm <strong>Nick K</strong> a software
-              engineer, who dives deep into the unknown. Welcome to the journey!
+              Hi 👋 I'm <strong>Nick K</strong> a software engineer, who dives
+              deep into the unknown. Welcome to the journey!
             </P>
             <P>
               Let's be friends on{" "}

@@ -7,7 +7,7 @@ export function H1({ className, ...props }: H1Props) {
   return (
     <h1
       className={cn(
-        "text-black mb-4 scroll-m-20 text-2xl font-bold md:text-3xl",
+        "mb-4 scroll-m-20 text-2xl font-bold text-black md:text-3xl",
         className,
       )}
       {...props}
@@ -23,7 +23,7 @@ export function H2({ className, children, ...props }: H2Props) {
   return (
     <h2
       className={cn(
-        "text-black mb-3 scroll-m-20 text-xl font-medium first:mt-0",
+        "mb-3 scroll-m-20 text-xl font-medium text-black first:mt-0",
         className,
       )}
       {...props}
@@ -39,7 +39,7 @@ export function H3({ className, children, ...props }: H3Props) {
   return (
     <h3
       className={cn(
-        "text-black mb-2 scroll-m-20 text-lg font-medium",
+        "mb-2 scroll-m-20 text-lg font-medium text-black",
         className,
       )}
       {...props}
@@ -54,10 +54,7 @@ export type H4Props = ComponentProps<"h4">;
 export function H4({ className, children, ...props }: H4Props) {
   return (
     <h4
-      className={cn(
-        "text-black scroll-m-20 text-base font-medium",
-        className,
-      )}
+      className={cn("scroll-m-20 text-base font-medium text-black", className)}
       {...props}
     >
       {children}

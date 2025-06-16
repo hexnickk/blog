@@ -1,9 +1,9 @@
-import fs from "node:fs/promises";
 import path from "node:path";
 import { matter } from "vfile-matter";
 import { Struct } from "app/lib/struct";
 import { z } from "zod";
 import { read } from "to-vfile";
+import { glob } from "zx";
 
 export namespace Content {
   export class Post extends Struct {
@@ -70,8 +70,9 @@ export namespace Content {
 
   export async function listAll(): Promise<Entry[]> {
     const contentDir = path.join(process.cwd(), "content");
-    const filenames = await fs.readdir(contentDir, { recursive: true });
-    const files = filenames.filter((filename) => filename.endsWith(".md"));
+    const files = await glob("**/*.md", {
+      cwd: contentDir,
+    });
 
     const entries = await Promise.all(
       files.map(async (filename) => {
@@ -83,6 +84,8 @@ export namespace Content {
         const slug = filename
           .replace(/\.md$/, "")
           .split(path.sep)
+          // Ignore index part
+          .slice(0, -1)
           .join("-");
 
         switch (metadata.type) {
@@ -114,6 +117,14 @@ export namespace Content {
     entries.sort((a, b) => (b.date < a.date ? -1 : 1));
 
     return entries;
+  }
+
+  export async function listPublic(): Promise<Content.Entry[]> {
+    const entries = await listAll();
+    return entries.filter(
+      (entry) =>
+        entry.type !== "post" || (entry.type === "post" && !entry.draft),
+    );
   }
 
   export async function getPost(slug: string): Promise<Post | undefined> {

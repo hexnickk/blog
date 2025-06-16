@@ -12,6 +12,7 @@ import { Link } from "app/components/ui/link";
 import { Config } from "app/modules/config";
 import { ArrowLeft } from "lucide-react";
 import { Layout } from "app/components/layout";
+import { visit } from "unist-util-visit";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -20,18 +21,35 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+function remarkImagePaths(options: { prefix?: string } = {}) {
+  const { prefix = "" } = options;
+
+  return (tree: any) => {
+    visit(tree, "image", (node) => {
+      // Only modify relative paths
+      if (node.url.startsWith("./") || node.url.startsWith("../")) {
+        // Modify the node's URL property directly
+        node.url = `${prefix}${node.url.replace("./", "/")}`;
+      }
+    });
+  };
+}
+
 export async function loader({ params }: Route.LoaderArgs) {
   const post = await Content.getPost(params.slug);
+  const slug = params.slug;
 
   return {
     post,
+    slug,
   };
 }
 
 export default function PostsSlug({ loaderData }: Route.ComponentProps) {
-  const { post } = loaderData;
+  const { post, slug } = loaderData;
   const processor = unified()
     .use(remarkParse)
+    .use(remarkImagePaths, { prefix: `/content/${slug}` })
     .use(remarkRehype)
     .use(rehypeReact, {
       createElement: React.createElement,
@@ -53,6 +71,17 @@ export default function PostsSlug({ loaderData }: Route.ComponentProps) {
         },
         a: Link,
         p: P,
+        img: function ImgWrapper({
+          className,
+          ...rest
+        }: ComponentProps<"img">) {
+          return (
+            <img
+              className={cn("rounded-md border border-gray-200", className)}
+              {...rest}
+            />
+          );
+        },
       },
     });
   const content = processor.processSync(post?.content).result;

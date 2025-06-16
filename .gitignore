@@ -6,3 +6,6 @@
 /build/
 
 .env
+
+# Published content
+public/content
