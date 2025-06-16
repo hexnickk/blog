@@ -80,6 +80,11 @@ export namespace Content {
         matter(vFile, { strip: true });
         const metadata = vFile.data.matter as any;
 
+        const slug = filename
+          .replace(/\.md$/, "")
+          .split(path.sep)
+          .join("-");
+
         switch (metadata.type) {
           case "link":
             return Link.fromRaw({
@@ -91,7 +96,7 @@ export namespace Content {
             });
           case "post":
             return Post.fromRaw({
-              slug: filename.replace(/\.md$/, ""),
+              slug,
               type: metadata.type,
               draft: metadata.draft!,
               icon: metadata.icon ?? "PencilLine",
