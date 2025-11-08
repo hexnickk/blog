@@ -3,6 +3,15 @@ import { useRef, useState, useEffect, useCallback } from "react";
 
 type ShapeType = "circle" | "square" | "triangle" | "cross" | "diamond";
 
+// Auto-scaling factors for different shapes to normalize visual density
+const SHAPE_SCALE_FACTORS: Record<ShapeType, number> = {
+  circle: 1.0,
+  square: 0.75,
+  triangle: 0.9,
+  cross: 1.4,
+  diamond: 0.9,
+};
+
 // Debounce hook for slider inputs
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -23,7 +32,8 @@ function useDebounce<T>(value: T, delay: number): T {
 export default function Halftone() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const [dotSize, setDotSize] = useState(8);
+  const [spacing, setSpacing] = useState(8);
+  const [shapeSize, setShapeSize] = useState(1);
   const [shape, setShape] = useState<ShapeType>("circle");
   const [color, setColor] = useState("#000000");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
@@ -31,7 +41,8 @@ export default function Halftone() {
   const [contrast, setContrast] = useState(1);
 
   // Debounce slider values to avoid excessive reprocessing
-  const debouncedDotSize = useDebounce(dotSize, 100);
+  const debouncedSpacing = useDebounce(spacing, 100);
+  const debouncedShapeSize = useDebounce(shapeSize, 100);
   const debouncedThreshold = useDebounce(threshold, 100);
   const debouncedContrast = useDebounce(contrast, 100);
 
@@ -115,7 +126,8 @@ export default function Halftone() {
   const generateHalftone = useCallback((
     img: HTMLImageElement,
     shapeType: ShapeType = shape,
-    cellSize: number = debouncedDotSize,
+    cellSize: number = debouncedSpacing,
+    shapeSizeMultiplier: number = debouncedShapeSize,
     shapeColor: string = color,
     bgColor: string = backgroundColor,
     thresholdValue: number = debouncedThreshold,
@@ -167,18 +179,24 @@ export default function Halftone() {
         // Calculate size based on brightness
         // Darker pixels = larger shapes
         const normalizedBrightness = 1 - (avgBrightness / 255);
-        const size = normalizedBrightness * (cellSize / 2);
 
-        // Apply threshold - skip if size is below threshold
-        if (size < thresholdValue) {
+        // Apply brightness threshold - skip if brightness is below threshold
+        // This ensures threshold is independent of spacing and shape size
+        if (normalizedBrightness < thresholdValue) {
           continue;
         }
+
+        const baseSize = normalizedBrightness * (cellSize / 2);
+
+        // Apply auto-scaling factor for shape type + user's size multiplier
+        const autoScale = SHAPE_SCALE_FACTORS[shapeType];
+        const size = baseSize * autoScale * shapeSizeMultiplier;
 
         // Draw shape
         drawShape(ctx, x, y, size, shapeType, cellSize);
       }
     }
-  }, [shape, debouncedDotSize, color, backgroundColor, debouncedThreshold, debouncedContrast, drawShape]);
+  }, [shape, debouncedSpacing, debouncedShapeSize, color, backgroundColor, debouncedThreshold, debouncedContrast, drawShape]);
 
   // Auto-regenerate when parameters change
   useEffect(() => {
@@ -200,13 +218,27 @@ export default function Halftone() {
         />
         <div className="mt-4">
           <label>
-            Dot Size: {dotSize}px
+            Spacing: {spacing}px
             <input
               type="range"
               min="2"
               max="20"
-              value={dotSize}
-              onChange={(e) => setDotSize(parseInt(e.target.value))}
+              value={spacing}
+              onChange={(e) => setSpacing(parseInt(e.target.value))}
+              className="block w-full"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Shape Size: {shapeSize.toFixed(2)}x
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={shapeSize}
+              onChange={(e) => setShapeSize(parseFloat(e.target.value))}
               className="block w-full"
             />
           </label>
@@ -251,12 +283,12 @@ export default function Halftone() {
         </div>
         <div className="mt-4">
           <label>
-            Threshold: {threshold.toFixed(1)}px
+            Brightness Threshold: {(threshold * 100).toFixed(0)}%
             <input
               type="range"
               min="0"
-              max="10"
-              step="0.1"
+              max="1"
+              step="0.01"
               value={threshold}
               onChange={(e) => setThreshold(parseFloat(e.target.value))}
               className="block w-full"
