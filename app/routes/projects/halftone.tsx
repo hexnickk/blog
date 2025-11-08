@@ -12,6 +12,100 @@ const SHAPE_SCALE_FACTORS: Record<ShapeType, number> = {
   diamond: 0.9,
 };
 
+// Dithering matrices for ordered dithering
+// Values normalized to 0-1 range
+
+// 2x2 Bayer - Coarse pattern, larger blocks
+const BAYER_MATRIX_2x2 = [
+  [0, 2],
+  [3, 1]
+].map(row => row.map(val => val / 4));
+
+// 4x4 Bayer - Medium pattern
+const BAYER_MATRIX_4x4 = [
+  [0,  8,  2,  10],
+  [12, 4,  14, 6],
+  [3,  11, 1,  9],
+  [15, 7,  13, 5]
+].map(row => row.map(val => val / 16));
+
+// 8x8 Bayer - Good balance of detail and pattern
+const BAYER_MATRIX_8x8 = [
+  [0, 32, 8, 40, 2, 34, 10, 42],
+  [48, 16, 56, 24, 50, 18, 58, 26],
+  [12, 44, 4, 36, 14, 46, 6, 38],
+  [60, 28, 52, 20, 62, 30, 54, 22],
+  [3, 35, 11, 43, 1, 33, 9, 41],
+  [51, 19, 59, 27, 49, 17, 57, 25],
+  [15, 47, 7, 39, 13, 45, 5, 37],
+  [63, 31, 55, 23, 61, 29, 53, 21]
+].map(row => row.map(val => val / 64));
+
+// Clustered-dot halftone - Traditional newspaper look
+const CLUSTERED_DOT_6x6 = [
+  [24, 17, 13, 14, 18, 25],
+  [16, 8,  4,  5,  9,  19],
+  [12, 3,  0,  1,  6,  15],
+  [11, 2,  1,  0,  7,  20],
+  [23, 10, 6,  5,  11, 21],
+  [31, 22, 15, 14, 26, 32]
+].map(row => row.map(val => val / 36));
+
+// Horizontal scanlines
+const HORIZONTAL_LINES_4x4 = [
+  [0, 0, 0, 0],
+  [2, 2, 2, 2],
+  [1, 1, 1, 1],
+  [3, 3, 3, 3]
+].map(row => row.map(val => val / 4));
+
+// Diagonal stripes
+const DIAGONAL_LINES_4x4 = [
+  [0, 1, 2, 3],
+  [1, 2, 3, 0],
+  [2, 3, 0, 1],
+  [3, 0, 1, 2]
+].map(row => row.map(val => val / 4));
+
+// Vertical scanlines
+const VERTICAL_LINES_4x4 = [
+  [0, 1, 2, 3],
+  [0, 1, 2, 3],
+  [0, 1, 2, 3],
+  [0, 1, 2, 3]
+].map(row => row.map(val => val / 4));
+
+// Checkerboard pattern
+const CHECKERBOARD_4x4 = [
+  [0, 1, 0, 1],
+  [1, 0, 1, 0],
+  [0, 1, 0, 1],
+  [1, 0, 1, 0]
+].map(row => row.map(val => val / 2));
+
+// Circular/Radial pattern
+const CIRCULAR_5x5 = [
+  [4, 3, 2, 3, 4],
+  [3, 1, 0, 1, 3],
+  [2, 0, 0, 0, 2],
+  [3, 1, 0, 1, 3],
+  [4, 3, 2, 3, 4]
+].map(row => row.map(val => val / 5));
+
+type DitherPattern = "variable" | "bayer2" | "bayer4" | "bayer8" | "clustered" | "horizontal" | "vertical" | "diagonal" | "checkerboard" | "circular";
+
+const DITHER_MATRICES: Record<Exclude<DitherPattern, "variable">, number[][]> = {
+  bayer2: BAYER_MATRIX_2x2,
+  bayer4: BAYER_MATRIX_4x4,
+  bayer8: BAYER_MATRIX_8x8,
+  clustered: CLUSTERED_DOT_6x6,
+  horizontal: HORIZONTAL_LINES_4x4,
+  vertical: VERTICAL_LINES_4x4,
+  diagonal: DIAGONAL_LINES_4x4,
+  checkerboard: CHECKERBOARD_4x4,
+  circular: CIRCULAR_5x5
+};
+
 // Debounce hook for slider inputs
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -34,17 +128,28 @@ export default function Halftone() {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [spacing, setSpacing] = useState(8);
   const [shapeSize, setShapeSize] = useState(1);
-  const [shape, setShape] = useState<ShapeType>("circle");
-  const [color, setColor] = useState("#000000");
+  const [ditherPattern, setDitherPattern] = useState<DitherPattern>("bayer8");
+  const [colorA, setColorA] = useState("#000000");
+  const [colorB, setColorB] = useState("#ff0000");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-  const [threshold, setThreshold] = useState(0);
+  const [thresholdMin, setThresholdMin] = useState(0);
+  const [thresholdMax, setThresholdMax] = useState(1);
   const [contrast, setContrast] = useState(1);
+  const [brightness, setBrightness] = useState(0);
+  const [blur, setBlur] = useState(0);
+  const [posterize, setPosterize] = useState(256);
+  const [angle, setAngle] = useState(45);
 
   // Debounce slider values to avoid excessive reprocessing
   const debouncedSpacing = useDebounce(spacing, 100);
   const debouncedShapeSize = useDebounce(shapeSize, 100);
-  const debouncedThreshold = useDebounce(threshold, 100);
+  const debouncedThresholdMin = useDebounce(thresholdMin, 100);
+  const debouncedThresholdMax = useDebounce(thresholdMax, 100);
   const debouncedContrast = useDebounce(contrast, 100);
+  const debouncedBrightness = useDebounce(brightness, 100);
+  const debouncedBlur = useDebounce(blur, 100);
+  const debouncedPosterize = useDebounce(posterize, 100);
+  const debouncedAngle = useDebounce(angle, 100);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,14 +230,21 @@ export default function Halftone() {
 
   const generateHalftone = useCallback((
     img: HTMLImageElement,
-    shapeType: ShapeType = shape,
     cellSize: number = debouncedSpacing,
     shapeSizeMultiplier: number = debouncedShapeSize,
-    shapeColor: string = color,
+    pattern: DitherPattern = ditherPattern,
+    colorAValue: string = colorA,
+    colorBValue: string = colorB,
     bgColor: string = backgroundColor,
-    thresholdValue: number = debouncedThreshold,
-    contrastValue: number = debouncedContrast
+    thresholdMinValue: number = debouncedThresholdMin,
+    thresholdMaxValue: number = debouncedThresholdMax,
+    contrastValue: number = debouncedContrast,
+    brightnessValue: number = debouncedBrightness,
+    blurValue: number = debouncedBlur,
+    posterizeValue: number = debouncedPosterize,
+    angleValue: number = debouncedAngle
   ) => {
+    const shapeType: ShapeType = "square"; // Fixed shape
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -143,60 +255,161 @@ export default function Halftone() {
     canvas.width = img.width;
     canvas.height = img.height;
 
+    // Apply blur filter if needed
+    if (blurValue > 0) {
+      ctx.filter = `blur(${blurValue}px)`;
+    }
+
     // Draw original image to get pixel data
     ctx.drawImage(img, 0, 0);
+
+    // Reset filter
+    ctx.filter = 'none';
+
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // Clear canvas for halftone output with background color
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Halftone parameters
-    ctx.fillStyle = shapeColor;
+    // Helper function to interpolate between two colors
+    const interpolateColor = (colorA: string, colorB: string, t: number): string => {
+      // Parse hex colors
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+      };
 
-    // Process image in grid
-    for (let y = 0; y < canvas.height; y += cellSize) {
-      for (let x = 0; x < canvas.width; x += cellSize) {
-        // Calculate average brightness in this cell
+      const rgbA = hexToRgb(colorA);
+      const rgbB = hexToRgb(colorB);
+
+      const r = Math.round(rgbA.r + (rgbB.r - rgbA.r) * t);
+      const g = Math.round(rgbA.g + (rgbB.g - rgbA.g) * t);
+      const b = Math.round(rgbA.b + (rgbB.b - rgbA.b) * t);
+
+      return `rgb(${r}, ${g}, ${b})`;
+    };
+
+    // Convert angle to radians for rotation
+    const angleRad = (angleValue * Math.PI) / 180;
+    const cosAngle = Math.cos(angleRad);
+    const sinAngle = Math.sin(angleRad);
+
+    // Calculate center of canvas for rotation
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // Calculate bounding box for rotated grid
+    const diagonal = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+    const gridExtent = Math.ceil(diagonal / cellSize) + 1;
+
+    // Get the selected dither matrix (if not using variable size)
+    const useVariableSize = pattern === "variable";
+    const ditherMatrix = useVariableSize ? null : DITHER_MATRICES[pattern];
+    const matrixSize = ditherMatrix?.length ?? 1;
+
+    // Auto-scaling factor for shapes
+    const autoScale = SHAPE_SCALE_FACTORS[shapeType];
+
+    // Process image in rotated grid using selected dither matrix
+    for (let gridY = -gridExtent; gridY < gridExtent; gridY++) {
+      for (let gridX = -gridExtent; gridX < gridExtent; gridX++) {
+        // Calculate position in rotated grid space
+        const localX = gridX * cellSize;
+        const localY = gridY * cellSize;
+
+        // Standard rotation around center
+        const rotatedX = localX * cosAngle - localY * sinAngle + centerX;
+        const rotatedY = localX * sinAngle + localY * cosAngle + centerY;
+
+        // Skip if outside canvas bounds
+        if (rotatedX < 0 || rotatedX >= canvas.width || rotatedY < 0 || rotatedY >= canvas.height) {
+          continue;
+        }
+
+        // Sample brightness in the cell area
         let brightnessSum = 0;
         let pixelCount = 0;
 
-        for (let dy = 0; dy < cellSize && y + dy < canvas.height; dy++) {
-          for (let dx = 0; dx < cellSize && x + dx < canvas.width; dx++) {
-            const i = ((y + dy) * canvas.width + (x + dx)) * 4;
-            // Convert to grayscale (average RGB)
-            const brightness = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
-            brightnessSum += brightness;
-            pixelCount++;
+        // Sample in the cell area
+        const sampleSize = Math.ceil(cellSize * 0.7);
+        for (let dy = -sampleSize / 2; dy < sampleSize / 2; dy++) {
+          for (let dx = -sampleSize / 2; dx < sampleSize / 2; dx++) {
+            const sampleX = Math.floor(rotatedX + dx);
+            const sampleY = Math.floor(rotatedY + dy);
+
+            // Check bounds
+            if (sampleX >= 0 && sampleX < canvas.width && sampleY >= 0 && sampleY < canvas.height) {
+              const i = (sampleY * canvas.width + sampleX) * 4;
+              // Convert to grayscale (average RGB)
+              const brightness = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+              brightnessSum += brightness;
+              pixelCount++;
+            }
           }
         }
 
+        if (pixelCount === 0) continue;
+
         let avgBrightness = brightnessSum / pixelCount;
+
+        // Apply brightness adjustment (-100 to +100)
+        avgBrightness = Math.min(255, Math.max(0, avgBrightness + brightnessValue));
 
         // Apply contrast
         avgBrightness = Math.min(255, Math.max(0, avgBrightness * contrastValue));
 
-        // Calculate size based on brightness
-        // Darker pixels = larger shapes
-        const normalizedBrightness = 1 - (avgBrightness / 255);
+        // Normalize brightness (0 = black, 1 = white)
+        let normalizedBrightness = avgBrightness / 255;
 
-        // Apply brightness threshold - skip if brightness is below threshold
-        // This ensures threshold is independent of spacing and shape size
-        if (normalizedBrightness < thresholdValue) {
+        // Apply posterize/quantization
+        if (posterizeValue < 256) {
+          normalizedBrightness = Math.round(normalizedBrightness * (posterizeValue - 1)) / (posterizeValue - 1);
+        }
+
+        const darkness = 1 - normalizedBrightness;
+
+        // Apply brightness threshold range
+        if (darkness < thresholdMinValue || darkness > thresholdMaxValue) {
           continue;
         }
 
-        const baseSize = normalizedBrightness * (cellSize / 2);
+        let dotSize: number;
 
-        // Apply auto-scaling factor for shape type + user's size multiplier
-        const autoScale = SHAPE_SCALE_FACTORS[shapeType];
-        const size = baseSize * autoScale * shapeSizeMultiplier;
+        if (useVariableSize) {
+          // Variable size mode: dot size varies with darkness
+          dotSize = darkness * (cellSize / 2) * autoScale * shapeSizeMultiplier;
+        } else {
+          // Dithering mode: use matrix threshold
+          // Get matrix threshold for this position
+          const matrixX = ((gridX % matrixSize) + matrixSize) % matrixSize;
+          const matrixY = ((gridY % matrixSize) + matrixSize) % matrixSize;
+          const matrixThreshold = ditherMatrix![matrixY][matrixX];
 
-        // Draw shape
-        drawShape(ctx, x, y, size, shapeType, cellSize);
+          // Matrix comparison - skip if darkness doesn't exceed threshold
+          if (darkness < matrixThreshold) {
+            continue;
+          }
+
+          // Uniform dot size for dithering patterns
+          dotSize = (cellSize / 2) * autoScale * shapeSizeMultiplier;
+        }
+
+        // Interpolate color based on brightness
+        // Dark areas (low brightness) → colorA
+        // Light areas (high brightness) → colorB
+        const dotColor = interpolateColor(colorAValue, colorBValue, normalizedBrightness);
+        ctx.fillStyle = dotColor;
+
+        // Draw shape (adjusted for cell centering)
+        drawShape(ctx, rotatedX - cellSize / 2, rotatedY - cellSize / 2, dotSize, shapeType, cellSize);
       }
     }
-  }, [shape, debouncedSpacing, debouncedShapeSize, color, backgroundColor, debouncedThreshold, debouncedContrast, drawShape]);
+  }, [debouncedSpacing, debouncedShapeSize, ditherPattern, colorA, colorB, backgroundColor, debouncedThresholdMin, debouncedThresholdMax, debouncedContrast, debouncedBrightness, debouncedBlur, debouncedPosterize, debouncedAngle, drawShape]);
 
   // Auto-regenerate when parameters change
   useEffect(() => {
@@ -245,27 +458,43 @@ export default function Halftone() {
         </div>
         <div className="mt-4">
           <label>
-            Shape:
+            Pattern:
             <select
-              value={shape}
-              onChange={(e) => setShape(e.target.value as ShapeType)}
+              value={ditherPattern}
+              onChange={(e) => setDitherPattern(e.target.value as DitherPattern)}
               className="block border p-2"
             >
-              <option value="circle">Circle</option>
-              <option value="square">Square</option>
-              <option value="triangle">Triangle</option>
-              <option value="cross">Cross</option>
-              <option value="diamond">Diamond</option>
+              <option value="variable">Variable Size (Classic)</option>
+              <option value="bayer2">Bayer 2x2 (Blocky)</option>
+              <option value="bayer4">Bayer 4x4 (Medium)</option>
+              <option value="bayer8">Bayer 8x8 (Fine)</option>
+              <option value="clustered">Clustered Dot (Newspaper)</option>
+              <option value="horizontal">Horizontal Lines</option>
+              <option value="vertical">Vertical Lines</option>
+              <option value="diagonal">Diagonal Lines</option>
+              <option value="checkerboard">Checkerboard</option>
+              <option value="circular">Circular</option>
             </select>
           </label>
         </div>
         <div className="mt-4">
           <label>
-            Color:
+            Color A (Dark areas):
             <input
               type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={colorA}
+              onChange={(e) => setColorA(e.target.value)}
+              className="block h-10 w-20"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Color B (Light areas):
+            <input
+              type="color"
+              value={colorB}
+              onChange={(e) => setColorB(e.target.value)}
               className="block h-10 w-20"
             />
           </label>
@@ -283,16 +512,39 @@ export default function Halftone() {
         </div>
         <div className="mt-4">
           <label>
-            Brightness Threshold: {(threshold * 100).toFixed(0)}%
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={threshold}
-              onChange={(e) => setThreshold(parseFloat(e.target.value))}
-              className="block w-full"
-            />
+            Brightness Range: {(thresholdMin * 100).toFixed(0)}% - {(thresholdMax * 100).toFixed(0)}%
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-16">Min:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={thresholdMin}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (val <= thresholdMax) setThresholdMin(val);
+                  }}
+                  className="flex-1"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-16">Max:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={thresholdMax}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (val >= thresholdMin) setThresholdMax(val);
+                  }}
+                  className="flex-1"
+                />
+              </div>
+            </div>
           </label>
         </div>
         <div className="mt-4">
@@ -305,6 +557,62 @@ export default function Halftone() {
               step="0.1"
               value={contrast}
               onChange={(e) => setContrast(parseFloat(e.target.value))}
+              className="block w-full"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Brightness: {brightness}
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              step="1"
+              value={brightness}
+              onChange={(e) => setBrightness(parseInt(e.target.value))}
+              className="block w-full"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Blur: {blur}px
+            <input
+              type="range"
+              min="0"
+              max="5"
+              step="0.5"
+              value={blur}
+              onChange={(e) => setBlur(parseFloat(e.target.value))}
+              className="block w-full"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Posterize Levels: {posterize === 256 ? 'Off' : posterize}
+            <input
+              type="range"
+              min="2"
+              max="256"
+              step="1"
+              value={posterize}
+              onChange={(e) => setPosterize(parseInt(e.target.value))}
+              className="block w-full"
+            />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Rotation Angle: {angle}°
+            <input
+              type="range"
+              min="0"
+              max="90"
+              step="1"
+              value={angle}
+              onChange={(e) => setAngle(parseInt(e.target.value))}
               className="block w-full"
             />
           </label>

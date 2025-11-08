@@ -13,15 +13,9 @@
     - Generate **responsive** designs using only two breakpoints: mobile (default) and desktop+tablet (`md:` and above). Never use `sm:`, `lg:`, `xl:`, or `2xl:` breakpoints.
 1.  **HTML & Accessibility:**
     - Use **semantic HTML** elements (`main`, `header`, `nav`, etc.).
-    - Implement accessibility best practices: correct ARIA roles/attributes, `alt` text for meaningful images.
-    - Use the `"sr-only"` Tailwind class for screen-reader-only text.
-1.  **Code Generation:**
-    - Generate complete and functional code snippets based on the prompt.
-    - Organize code logically (e.g., separate components, hooks, utils).
 1.  **Node.js Code:**
     - Use modern JavaScript (ES6+).
     - Use Node.js `import`, **never** `require`.
-    - Use the `sharp` library if image processing is needed.
 1.  **Images & Icons:**
     - Use icons from the `"lucide-react"` package. **Do not** output raw `<svg>` for icons.
     - When using `new Image()` with `<canvas>`, set `crossOrigin = "anonymous"`.
