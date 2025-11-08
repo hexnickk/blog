@@ -6,16 +6,17 @@
   "tailwind": {
     "config": "",
     "css": "app/app.css",
-    "baseColor": "zinc",
+    "baseColor": "slate",
     "cssVariables": true,
     "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
-    "components": "app/components",
-    "utils": "app/lib/utils",
-    "ui": "app/components/ui",
-    "lib": "app/lib",
-    "hooks": "app/hooks"
+    "components": "@/app/components",
+    "utils": "@/app/lib/utils",
+    "ui": "@/app/components/ui",
+    "lib": "@/app/lib",
+    "hooks": "@/app/lib/hooks"
   },
-  "iconLibrary": "lucide"
+  "registries": {}
 }

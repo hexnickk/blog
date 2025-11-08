@@ -11,10 +11,6 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Env } from "./modules/env";
 import { Config } from "./modules/config";
-import { useEffect, useState } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
-import { particlesOptions } from "./lib/particle-options";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -30,16 +26,6 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const [init, setInit] = useState(false);
-
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -67,7 +53,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {init && <Particles id="tsparticles" options={particlesOptions} />}
         {children}
         <ScrollRestoration />
         <Scripts />

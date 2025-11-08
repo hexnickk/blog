@@ -1,12 +1,10 @@
 import { PostPreview } from "app/components/post-preview";
 import type { Route } from "./+types/home";
 import { Content } from "app/modules/content";
-import { H2, H3, P, type H2Props } from "app/components/ui/typography";
+import { H2, P } from "app/components/ui/typography";
 import { Layout } from "app/components/layout";
 import { Config } from "app/modules/config";
 import { Link } from "app/components/ui/link";
-import { type ComponentProps } from "react";
-import { cn } from "app/lib/utils";
 import { LinkPreview } from "app/components/link-preview";
 
 export function meta({}: Route.MetaArgs) {
@@ -21,23 +19,15 @@ export async function loader({}: Route.LoaderArgs) {
   return { entries };
 }
 
-function Section({ className, ...rest }: ComponentProps<"section">) {
-  return <section className={cn("gap-4", className)} {...rest} />;
-}
-
-function SectionContent({ className, ...rest }: ComponentProps<"div">) {
-  return <div className={cn("ml-4", className)} {...rest} />;
-}
-
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { entries } = loaderData;
 
   return (
     <Layout>
       <div className="relative flex flex-col gap-6">
-        <Section>
+        <section className="gap-4">
           <H2>About</H2>
-          <SectionContent>
+          <div className="ml-4">
             <P>
               Hi 👋 I'm <strong>Nick K</strong> a software engineer, who dives
               deep into the unknown. Welcome to the journey!
@@ -53,12 +43,12 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </Link>
               .
             </P>
-          </SectionContent>
-        </Section>
+          </div>
+        </section>
 
-        <Section>
+        <section className="gap-4">
           <H2>Latest posts</H2>
-          <SectionContent>
+          <div className="ml-4">
             <div className="flex flex-1 flex-col gap-4">
               {entries.map(
                 (entries) =>
@@ -70,8 +60,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                   )),
               )}
             </div>
-          </SectionContent>
-        </Section>
+          </div>
+        </section>
       </div>
     </Layout>
   );
