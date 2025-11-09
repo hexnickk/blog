@@ -380,7 +380,7 @@ export default function MasksPage() {
           </div>
 
           {/* Canvas Controls - compact on mobile */}
-          <div className="mt-2 md:mt-4">
+          {/* <div className="mt-2 md:mt-4">
             <div className="mb-2 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center md:mb-3">
               <Button
                 variant={eraseMode ? "default" : "outline"}
@@ -418,7 +418,7 @@ export default function MasksPage() {
                 Clear Edits
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Controls Section - scrollable with max height on mobile */}
