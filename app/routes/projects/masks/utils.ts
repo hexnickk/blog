@@ -10,7 +10,11 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
     : { r: 0, g: 0, b: 0 };
 }
 
-export function interpolateColor(colorA: string, colorB: string, t: number): string {
+export function interpolateColor(
+  colorA: string,
+  colorB: string,
+  t: number,
+): string {
   const rgbA = hexToRgb(colorA);
   const rgbB = hexToRgb(colorB);
 
@@ -26,7 +30,7 @@ export function resizeCanvas(
   canvas: HTMLCanvasElement,
   width: number,
   height: number,
-  preserveContent: boolean = false
+  preserveContent: boolean = false,
 ): void {
   if (canvas.width === width && canvas.height === height) return;
 

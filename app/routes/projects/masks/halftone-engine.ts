@@ -1,5 +1,9 @@
 import type { ShapeType, DitherPattern } from "./constants";
-import { ASCII_GRADIENT, SHAPE_SCALE_FACTORS, DITHER_MATRICES } from "./constants";
+import {
+  ASCII_GRADIENT,
+  SHAPE_SCALE_FACTORS,
+  DITHER_MATRICES,
+} from "./constants";
 import { interpolateColor, resizeCanvas } from "./utils";
 
 export interface HalftoneParams {
@@ -27,7 +31,7 @@ export function drawShape(
   size: number,
   shapeType: ShapeType,
   cellSize: number,
-  darkness: number = 0
+  darkness: number = 0,
 ): void {
   const centerX = x + cellSize / 2;
   const centerY = y + cellSize / 2;
@@ -41,7 +45,12 @@ export function drawShape(
 
     case "square":
       const squareSize = size * 2;
-      ctx.fillRect(centerX - squareSize / 2, centerY - squareSize / 2, squareSize, squareSize);
+      ctx.fillRect(
+        centerX - squareSize / 2,
+        centerY - squareSize / 2,
+        squareSize,
+        squareSize,
+      );
       break;
 
     case "ascii":
@@ -66,7 +75,7 @@ export function generateHalftone(
   canvas: HTMLCanvasElement,
   overlayCanvas: HTMLCanvasElement,
   eraseMask: HTMLCanvasElement | null,
-  params: HalftoneParams
+  params: HalftoneParams,
 ): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -108,9 +117,14 @@ export function generateHalftone(
   tempCtx.drawImage(img, 0, 0);
 
   // Reset filter
-  tempCtx.filter = 'none';
+  tempCtx.filter = "none";
 
-  const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+  const imageData = tempCtx.getImageData(
+    0,
+    0,
+    tempCanvas.width,
+    tempCanvas.height,
+  );
 
   // Convert angle to radians for rotation
   const angleRad = (params.angle * Math.PI) / 180;
@@ -122,12 +136,16 @@ export function generateHalftone(
   const centerY = canvas.height / 2;
 
   // Calculate bounding box for rotated grid
-  const diagonal = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+  const diagonal = Math.sqrt(
+    canvas.width * canvas.width + canvas.height * canvas.height,
+  );
   const gridExtent = Math.ceil(diagonal / params.cellSize) + 1;
 
   // Get the selected dither matrix (if not using variable size)
   const useVariableSize = params.pattern === "variable";
-  const ditherMatrix = useVariableSize ? null : DITHER_MATRICES[params.pattern as Exclude<DitherPattern, "variable">];
+  const ditherMatrix = useVariableSize
+    ? null
+    : DITHER_MATRICES[params.pattern as Exclude<DitherPattern, "variable">];
   const matrixSize = ditherMatrix?.length ?? 1;
 
   // Auto-scaling factor for shapes
@@ -145,7 +163,12 @@ export function generateHalftone(
       const rotatedY = localX * sinAngle + localY * cosAngle + centerY;
 
       // Skip if outside canvas bounds
-      if (rotatedX < 0 || rotatedX >= canvas.width || rotatedY < 0 || rotatedY >= canvas.height) {
+      if (
+        rotatedX < 0 ||
+        rotatedX >= canvas.width ||
+        rotatedY < 0 ||
+        rotatedY >= canvas.height
+      ) {
         continue;
       }
 
@@ -161,10 +184,19 @@ export function generateHalftone(
           const sampleY = Math.floor(rotatedY + dy);
 
           // Check bounds
-          if (sampleX >= 0 && sampleX < canvas.width && sampleY >= 0 && sampleY < canvas.height) {
+          if (
+            sampleX >= 0 &&
+            sampleX < canvas.width &&
+            sampleY >= 0 &&
+            sampleY < canvas.height
+          ) {
             const i = (sampleY * canvas.width + sampleX) * 4;
             // Convert to grayscale (average RGB)
-            const brightness = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+            const brightness =
+              (imageData.data[i] +
+                imageData.data[i + 1] +
+                imageData.data[i + 2]) /
+              3;
             brightnessSum += brightness;
             pixelCount++;
           }
@@ -176,17 +208,25 @@ export function generateHalftone(
       let avgBrightness = brightnessSum / pixelCount;
 
       // Apply brightness adjustment (-100 to +100)
-      avgBrightness = Math.min(255, Math.max(0, avgBrightness + params.brightness));
+      avgBrightness = Math.min(
+        255,
+        Math.max(0, avgBrightness + params.brightness),
+      );
 
       // Apply contrast
-      avgBrightness = Math.min(255, Math.max(0, avgBrightness * params.contrast));
+      avgBrightness = Math.min(
+        255,
+        Math.max(0, avgBrightness * params.contrast),
+      );
 
       // Normalize brightness (0 = black, 1 = white)
       let normalizedBrightness = avgBrightness / 255;
 
       // Apply posterize/quantization
       if (params.posterize < 256) {
-        normalizedBrightness = Math.round(normalizedBrightness * (params.posterize - 1)) / (params.posterize - 1);
+        normalizedBrightness =
+          Math.round(normalizedBrightness * (params.posterize - 1)) /
+          (params.posterize - 1);
       }
 
       const darkness = 1 - normalizedBrightness;
@@ -200,7 +240,11 @@ export function generateHalftone(
 
       if (useVariableSize) {
         // Variable size mode: dot size varies with darkness
-        dotSize = darkness * (params.cellSize / 2) * autoScale * params.shapeSizeMultiplier;
+        dotSize =
+          darkness *
+          (params.cellSize / 2) *
+          autoScale *
+          params.shapeSizeMultiplier;
       } else {
         // Dithering mode: use matrix threshold
         if (!ditherMatrix) continue; // Type safety: should never happen but guards against null
@@ -216,15 +260,28 @@ export function generateHalftone(
         }
 
         // Uniform dot size for dithering patterns
-        dotSize = (params.cellSize / 2) * autoScale * params.shapeSizeMultiplier;
+        dotSize =
+          (params.cellSize / 2) * autoScale * params.shapeSizeMultiplier;
       }
 
       // Interpolate color based on brightness
-      const dotColor = interpolateColor(params.colorA, params.colorB, normalizedBrightness);
+      const dotColor = interpolateColor(
+        params.colorA,
+        params.colorB,
+        normalizedBrightness,
+      );
       overlayCtx.fillStyle = dotColor;
 
       // Draw shape (adjusted for cell centering)
-      drawShape(overlayCtx, rotatedX - params.cellSize / 2, rotatedY - params.cellSize / 2, dotSize, params.shapeType, params.cellSize, darkness);
+      drawShape(
+        overlayCtx,
+        rotatedX - params.cellSize / 2,
+        rotatedY - params.cellSize / 2,
+        dotSize,
+        params.shapeType,
+        params.cellSize,
+        darkness,
+      );
     }
   }
 
@@ -242,7 +299,7 @@ export function eraseAtPoint(
   overlayCanvas: HTMLCanvasElement,
   x: number,
   y: number,
-  brushSize: number
+  brushSize: number,
 ): void {
   const maskCtx = eraseMask.getContext("2d");
   const overlayCtx = overlayCanvas.getContext("2d");
@@ -273,7 +330,7 @@ export function clearEraseMask(eraseMask: HTMLCanvasElement): void {
 // Export merged canvas (base + overlay)
 export function exportMergedCanvas(
   baseCanvas: HTMLCanvasElement,
-  overlayCanvas: HTMLCanvasElement
+  overlayCanvas: HTMLCanvasElement,
 ): string {
   const mergedCanvas = document.createElement("canvas");
   mergedCanvas.width = baseCanvas.width;
