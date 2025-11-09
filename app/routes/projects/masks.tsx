@@ -413,9 +413,17 @@ export default function Halftone() {
 
   return (
     <div className="max-w-6xl m-auto px-4 py-24 flex flex-row gap-8">
-      {/* Controls */}
+      {/* Canvas */}
       <div className="flex-1">
-        <H1>Halftone Generator</H1>
+        <canvas
+          ref={canvasRef}
+          className="block w-full border"
+        />
+      </div>
+
+      {/* Controls */}
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)] pr-2">
+        <H1>Masks Generator</H1>
         <input
           className="border p-2"
           type="file"
@@ -633,14 +641,6 @@ export default function Halftone() {
             Download Halftone
           </button>
         </div>
-      </div>
-
-      {/* Canvas */}
-      <div className="flex-1">
-        <canvas
-          ref={canvasRef}
-          className="block w-full border"
-        />
       </div>
     </div>
   );
