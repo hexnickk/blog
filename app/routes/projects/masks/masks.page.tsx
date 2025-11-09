@@ -321,6 +321,19 @@ export default function MasksPage() {
     runGeneration();
   }, [runGeneration]);
 
+  // Load default image on mount
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      imageRef.current = img;
+      runGeneration();
+    };
+    img.onerror = () => {
+      console.error("Failed to load default image");
+    };
+    img.src = "/massimiliano-morosinotto-3i5PHVp1Fkw-unsplash (1).jpg";
+  }, []); // Empty deps - run only once on mount
+
   // Auto-regenerate when form values change (with debounce)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -342,14 +355,14 @@ export default function MasksPage() {
             <canvas
               ref={canvasRef}
               className="block max-h-[50vh] w-full md:max-h-[70vh]"
-              style={{ objectFit: 'contain' }}
+              style={{ objectFit: "contain" }}
             />
             {/* Overlay layer: Halftone with erasing */}
             <canvas
               ref={overlayCanvasRef}
               className="absolute top-0 left-0 max-h-[50vh] w-full md:max-h-[70vh]"
               style={{
-                objectFit: 'contain',
+                objectFit: "contain",
                 cursor: eraseMode ? "crosshair" : "default",
                 touchAction: eraseMode ? "none" : "auto",
               }}
