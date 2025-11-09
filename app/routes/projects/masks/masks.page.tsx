@@ -1,8 +1,13 @@
 import { H1 } from "app/components/ui/typography";
 import { useRef, useState, useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import type { ShapeType, DitherPattern } from "./constants";
 import { generateHalftone, eraseAtPoint, clearEraseMask, exportMergedCanvas } from "./halftone-engine";
+import { Button } from "app/components/ui/button";
+import { Label } from "app/components/ui/label";
+import { Slider } from "app/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "app/components/ui/select";
+import { Eraser } from "lucide-react";
 
 interface HalftoneFormValues {
   spacing: number;
@@ -28,7 +33,7 @@ export default function MasksPage() {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   // Form state management with react-hook-form
-  const { register, watch, setValue } = useForm<HalftoneFormValues>({
+  const { register, watch, setValue, control } = useForm<HalftoneFormValues>({
     defaultValues: {
       spacing: 8,
       shapeSize: 1,
@@ -229,14 +234,14 @@ export default function MasksPage() {
     }, 150); // Increased debounce for better performance with large images
 
     return () => clearTimeout(timer);
-  }, [formValues]);
+  }, [runGeneration]);
 
   return (
     <div className="max-w-6xl m-auto px-4 py-24">
       <H1>Masks Generator</H1>
-      <div className="flex flex-row gap-8">
+      <div className="flex flex-row gap-8 h-[calc(100vh-16rem)]">
         {/* Canvas */}
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           <div className="relative w-full border">
             {/* Base layer: Background color */}
             <canvas
@@ -265,256 +270,274 @@ export default function MasksPage() {
           </div>
 
           {/* Canvas Controls */}
-          <div className="mt-4 p-4 border rounded bg-gray-50">
+          <div className="mt-4">
             <div className="flex items-center gap-4 mb-3">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={eraseMode}
-                  onChange={(e) => setEraseMode(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span className="font-medium">Erase Mode</span>
-              </label>
+              <Button
+                variant={eraseMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setEraseMode(!eraseMode)}
+              >
+                <Eraser className="mr-2 h-4 w-4" />
+                Erase Mode
+              </Button>
 
               <div className="flex-1">
-                <label className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <span className="text-sm whitespace-nowrap">Brush: {brushSize}px</span>
-                  <input
-                    type="range"
-                    min="5"
-                    max="100"
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(parseInt(e.target.value))}
+                  <Slider
+                    min={5}
+                    max={100}
+                    step={1}
+                    value={[brushSize]}
+                    onValueChange={(value) => setBrushSize(value[0])}
                     disabled={!eraseMode}
                     className="flex-1"
                   />
-                </label>
+                </Label>
               </div>
             </div>
-            <button
+            <Button
               onClick={handleClearEdits}
-              className="border px-3 py-1 text-sm bg-white hover:bg-gray-100 transition-colors rounded"
+              variant="outline"
+              size="sm"
             >
               Clear Edits
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)] pr-2">
-          <input
-            className="border p-2"
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-          />
-          <div className="mt-4">
-            <label>
-              Spacing: {formValues.spacing}px
-              <input
-                type="range"
-                min="2"
-                max="40"
-                {...register("spacing", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Shape Size: {formValues.shapeSize.toFixed(2)}x
-              <input
-                type="range"
-                min="0.5"
-                max="4"
-                step="0.1"
-                {...register("shapeSize", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Shape:
-              <select
-                {...register("shapeType")}
-                className="block border p-2"
-              >
-                <option value="circle">Circle</option>
-                <option value="square">Square</option>
-                <option value="ascii">ASCII Art</option>
-              </select>
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Pattern:
-              <select
-                {...register("ditherPattern")}
-                className="block border p-2"
-              >
-                <option value="variable">Variable Size (Classic)</option>
-                <option value="bayer2">Bayer 2x2 (Blocky)</option>
-                <option value="bayer4">Bayer 4x4 (Medium)</option>
-                <option value="bayer8">Bayer 8x8 (Fine)</option>
-                <option value="clustered">Clustered Dot (Newspaper)</option>
-                <option value="horizontal">Horizontal Lines</option>
-                <option value="vertical">Vertical Lines</option>
-                <option value="diagonal">Diagonal Lines</option>
-                <option value="checkerboard">Checkerboard</option>
-                <option value="circular">Circular</option>
-              </select>
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Color A (Dark areas):
-              <input
-                type="color"
-                {...register("colorA")}
-                className="block h-10 w-20"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Color B (Light areas):
-              <input
-                type="color"
-                {...register("colorB")}
-                className="block h-10 w-20"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Background Color:
-              <input
-                type="color"
-                {...register("backgroundColor")}
-                className="block h-10 w-20"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Brightness Range: {(formValues.thresholdMin * 100).toFixed(0)}% - {(formValues.thresholdMax * 100).toFixed(0)}%
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm w-16">Min:</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    {...register("thresholdMin", {
-                      valueAsNumber: true,
-                      onChange: (e) => {
-                        const val = parseFloat(e.target.value);
-                        if (val > formValues.thresholdMax) {
-                          setValue("thresholdMin", formValues.thresholdMax);
-                        }
-                      }
-                    })}
-                    className="flex-1"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm w-16">Max:</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    {...register("thresholdMax", {
-                      valueAsNumber: true,
-                      onChange: (e) => {
-                        const val = parseFloat(e.target.value);
-                        if (val < formValues.thresholdMin) {
-                          setValue("thresholdMax", formValues.thresholdMin);
-                        }
-                      }
-                    })}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Contrast: {formValues.contrast.toFixed(1)}
-              <input
-                type="range"
-                min="0.5"
-                max="2"
-                step="0.1"
-                {...register("contrast", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Brightness: {formValues.brightness}
-              <input
-                type="range"
-                min="-100"
-                max="100"
-                step="1"
-                {...register("brightness", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Blur: {formValues.blur}px
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="0.5"
-                {...register("blur", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Posterize Levels: {formValues.posterize === 256 ? 'Off' : formValues.posterize}
-              <input
-                type="range"
-                min="2"
-                max="256"
-                step="1"
-                {...register("posterize", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-4">
-            <label>
-              Rotation Angle: {formValues.angle}°
-              <input
-                type="range"
-                min="0"
-                max="90"
-                step="1"
-                {...register("angle", { valueAsNumber: true })}
-                className="block w-full"
-              />
-            </label>
-          </div>
-          <div className="mt-6">
-            <button
+        <div className="flex-1 overflow-y-auto pr-2">
+          <div className="space-y-3">
+            <input
+              className="border p-2 rounded-md w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            <Button
               onClick={handleDownload}
               disabled={!imageRef.current}
-              className="border px-4 py-2 bg-black text-white disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
+              variant="outline"
+              className="w-full"
             >
-              Download Halftone
-            </button>
+              Download Image
+            </Button>
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>
+              Spacing: {formValues.spacing}px
+            </Label>
+            <Controller
+              name="spacing"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={2}
+                  max={40}
+                  step={1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>
+              Shape Size: {formValues.shapeSize.toFixed(2)}x
+            </Label>
+            <Controller
+              name="shapeSize"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={0.5}
+                  max={4}
+                  step={0.1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Shape</Label>
+            <Controller
+              name="shapeType"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="circle">Circle</SelectItem>
+                    <SelectItem value="square">Square</SelectItem>
+                    <SelectItem value="ascii">ASCII Art</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Pattern</Label>
+            <Controller
+              name="ditherPattern"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="variable">Variable Size (Classic)</SelectItem>
+                    <SelectItem value="bayer2">Bayer 2x2 (Blocky)</SelectItem>
+                    <SelectItem value="bayer4">Bayer 4x4 (Medium)</SelectItem>
+                    <SelectItem value="bayer8">Bayer 8x8 (Fine)</SelectItem>
+                    <SelectItem value="clustered">Clustered Dot (Newspaper)</SelectItem>
+                    <SelectItem value="horizontal">Horizontal Lines</SelectItem>
+                    <SelectItem value="vertical">Vertical Lines</SelectItem>
+                    <SelectItem value="diagonal">Diagonal Lines</SelectItem>
+                    <SelectItem value="checkerboard">Checkerboard</SelectItem>
+                    <SelectItem value="circular">Circular</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <div className="mt-4">
+            <Label className="flex items-center justify-between">
+              <span>Color A (Dark areas)</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-muted-foreground">{formValues.colorA}</span>
+                <input
+                  type="color"
+                  {...register("colorA")}
+                  className="h-8 w-8 rounded border cursor-pointer"
+                />
+              </div>
+            </Label>
+          </div>
+          <div className="mt-4">
+            <Label className="flex items-center justify-between">
+              <span>Color B (Light areas)</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-muted-foreground">{formValues.colorB}</span>
+                <input
+                  type="color"
+                  {...register("colorB")}
+                  className="h-8 w-8 rounded border cursor-pointer"
+                />
+              </div>
+            </Label>
+          </div>
+          <div className="mt-4">
+            <Label className="flex items-center justify-between">
+              <span>Background Color</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-muted-foreground">{formValues.backgroundColor}</span>
+                <input
+                  type="color"
+                  {...register("backgroundColor")}
+                  className="h-8 w-8 rounded border cursor-pointer"
+                />
+              </div>
+            </Label>
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>
+              Brightness Range: {(formValues.thresholdMin * 100).toFixed(0)}% - {(formValues.thresholdMax * 100).toFixed(0)}%
+            </Label>
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={[formValues.thresholdMin, formValues.thresholdMax]}
+              onValueChange={(values) => {
+                setValue("thresholdMin", Math.min(values[0], values[1]));
+                setValue("thresholdMax", Math.max(values[0], values[1]));
+              }}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Contrast: {formValues.contrast.toFixed(1)}</Label>
+            <Controller
+              name="contrast"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={0.5}
+                  max={2}
+                  step={0.1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Brightness: {formValues.brightness}</Label>
+            <Controller
+              name="brightness"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={-100}
+                  max={100}
+                  step={1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Blur: {formValues.blur}px</Label>
+            <Controller
+              name="blur"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={0}
+                  max={5}
+                  step={0.5}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Posterize Levels: {formValues.posterize === 256 ? 'Off' : formValues.posterize}</Label>
+            <Controller
+              name="posterize"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={2}
+                  max={256}
+                  step={1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <Label>Rotation Angle: {formValues.angle}°</Label>
+            <Controller
+              name="angle"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  min={0}
+                  max={90}
+                  step={1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                />
+              )}
+            />
           </div>
         </div>
       </div>
