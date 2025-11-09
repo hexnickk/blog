@@ -99,16 +99,6 @@ export default function MasksPage() {
       };
 
       img.onload = () => {
-        // Validate image dimensions to prevent performance issues
-        const MAX_DIMENSION = 4096;
-        if (img.width > MAX_DIMENSION || img.height > MAX_DIMENSION) {
-          alert(
-            `Image is too large. Maximum dimensions are ${MAX_DIMENSION}x${MAX_DIMENSION}px. Your image is ${img.width}x${img.height}px.`,
-          );
-          e.target.value = "";
-          return;
-        }
-
         imageRef.current = img;
         runGeneration();
         // Reset file input to allow re-uploading the same file
