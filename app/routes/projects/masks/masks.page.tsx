@@ -82,16 +82,6 @@ export default function MasksPage() {
       return;
     }
 
-    // Validate file size (max 10MB)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
-    if (file.size > MAX_FILE_SIZE) {
-      alert(
-        `File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`,
-      );
-      e.target.value = "";
-      return;
-    }
-
     const img = new Image();
     const reader = new FileReader();
 
