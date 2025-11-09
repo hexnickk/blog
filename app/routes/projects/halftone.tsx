@@ -1,16 +1,21 @@
 import { H1 } from "app/components/ui/typography";
 import { useRef, useState, useEffect, useCallback } from "react";
 
-type ShapeType = "circle" | "square" | "triangle" | "cross" | "diamond";
+type ShapeType = "circle" | "square" | "ascii";
 
 // Auto-scaling factors for different shapes to normalize visual density
 const SHAPE_SCALE_FACTORS: Record<ShapeType, number> = {
   circle: 1.0,
   square: 0.75,
-  triangle: 0.9,
-  cross: 1.4,
-  diamond: 0.9,
+  ascii: 1.2,
 };
+
+// ASCII art character gradient - ordered from darkest (dense) to lightest (sparse)
+// Characters with more visual density represent darker areas
+const ASCII_GRADIENT = "@+.=- ";
+// Alternative gradients for experimentation:
+// const ASCII_GRADIENT = "@%#*+=-:. ";
+// const ASCII_GRADIENT = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
 // Dithering matrices for ordered dithering
 // Values normalized to 0-1 range
@@ -128,6 +133,7 @@ export default function Halftone() {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [spacing, setSpacing] = useState(8);
   const [shapeSize, setShapeSize] = useState(1);
+  const [shapeType, setShapeType] = useState<ShapeType>("square");
   const [ditherPattern, setDitherPattern] = useState<DitherPattern>("bayer8");
   const [colorA, setColorA] = useState("#000000");
   const [colorB, setColorB] = useState("#ff0000");
@@ -180,7 +186,7 @@ export default function Halftone() {
     link.click();
   };
 
-  const drawShape = useCallback((ctx: CanvasRenderingContext2D, x: number, y: number, size: number, shapeType: ShapeType, cellSize: number) => {
+  const drawShape = useCallback((ctx: CanvasRenderingContext2D, x: number, y: number, size: number, shapeType: ShapeType, cellSize: number, darkness: number = 0) => {
     const centerX = x + cellSize / 2;
     const centerY = y + cellSize / 2;
 
@@ -196,34 +202,20 @@ export default function Halftone() {
         ctx.fillRect(centerX - squareSize / 2, centerY - squareSize / 2, squareSize, squareSize);
         break;
 
-      case "triangle":
-        const triSize = size * 2;
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY - triSize / 2);
-        ctx.lineTo(centerX - triSize / 2, centerY + triSize / 2);
-        ctx.lineTo(centerX + triSize / 2, centerY + triSize / 2);
-        ctx.closePath();
-        ctx.fill();
-        break;
+      case "ascii":
+        // Map darkness (0 = light, 1 = dark) to character in gradient
+        // Darker areas get characters from the left (@ is darkest)
+        // Lighter areas get characters from the right (space is lightest)
+        const charIndex = Math.floor(darkness * (ASCII_GRADIENT.length - 1));
+        const char = ASCII_GRADIENT[charIndex];
 
-      case "cross":
-        const crossWidth = size / 3;
-        const crossLength = size * 2;
-        // Horizontal bar
-        ctx.fillRect(centerX - crossLength / 2, centerY - crossWidth / 2, crossLength, crossWidth);
-        // Vertical bar
-        ctx.fillRect(centerX - crossWidth / 2, centerY - crossLength / 2, crossWidth, crossLength);
-        break;
-
-      case "diamond":
-        const diamondSize = size * 2;
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY - diamondSize / 2);
-        ctx.lineTo(centerX + diamondSize / 2, centerY);
-        ctx.lineTo(centerX, centerY + diamondSize / 2);
-        ctx.lineTo(centerX - diamondSize / 2, centerY);
-        ctx.closePath();
-        ctx.fill();
+        // Font size scales with the size parameter (which includes shapeSizeMultiplier)
+        // Base size is cellSize, scaled by the size factor
+        const fontSize = (size / (cellSize / 2)) * cellSize * 0.8;
+        ctx.font = `${fontSize}px monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(char, centerX, centerY);
         break;
     }
   }, []);
@@ -232,6 +224,7 @@ export default function Halftone() {
     img: HTMLImageElement,
     cellSize: number = debouncedSpacing,
     shapeSizeMultiplier: number = debouncedShapeSize,
+    currentShapeType: ShapeType = shapeType,
     pattern: DitherPattern = ditherPattern,
     colorAValue: string = colorA,
     colorBValue: string = colorB,
@@ -244,7 +237,6 @@ export default function Halftone() {
     posterizeValue: number = debouncedPosterize,
     angleValue: number = debouncedAngle
   ) => {
-    const shapeType: ShapeType = "square"; // Fixed shape
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -313,7 +305,7 @@ export default function Halftone() {
     const matrixSize = ditherMatrix?.length ?? 1;
 
     // Auto-scaling factor for shapes
-    const autoScale = SHAPE_SCALE_FACTORS[shapeType];
+    const autoScale = SHAPE_SCALE_FACTORS[currentShapeType];
 
     // Process image in rotated grid using selected dither matrix
     for (let gridY = -gridExtent; gridY < gridExtent; gridY++) {
@@ -406,10 +398,11 @@ export default function Halftone() {
         ctx.fillStyle = dotColor;
 
         // Draw shape (adjusted for cell centering)
-        drawShape(ctx, rotatedX - cellSize / 2, rotatedY - cellSize / 2, dotSize, shapeType, cellSize);
+        // Pass darkness value for ASCII art character selection
+        drawShape(ctx, rotatedX - cellSize / 2, rotatedY - cellSize / 2, dotSize, currentShapeType, cellSize, darkness);
       }
     }
-  }, [debouncedSpacing, debouncedShapeSize, ditherPattern, colorA, colorB, backgroundColor, debouncedThresholdMin, debouncedThresholdMax, debouncedContrast, debouncedBrightness, debouncedBlur, debouncedPosterize, debouncedAngle, drawShape]);
+  }, [debouncedSpacing, debouncedShapeSize, shapeType, ditherPattern, colorA, colorB, backgroundColor, debouncedThresholdMin, debouncedThresholdMax, debouncedContrast, debouncedBrightness, debouncedBlur, debouncedPosterize, debouncedAngle, drawShape]);
 
   // Auto-regenerate when parameters change
   useEffect(() => {
@@ -454,6 +447,20 @@ export default function Halftone() {
               onChange={(e) => setShapeSize(parseFloat(e.target.value))}
               className="block w-full"
             />
+          </label>
+        </div>
+        <div className="mt-4">
+          <label>
+            Shape:
+            <select
+              value={shapeType}
+              onChange={(e) => setShapeType(e.target.value as ShapeType)}
+              className="block border p-2"
+            >
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+              <option value="ascii">ASCII Art</option>
+            </select>
           </label>
         </div>
         <div className="mt-4">
