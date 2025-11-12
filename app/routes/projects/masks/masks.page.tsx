@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "app/components/ui/select";
-import { Eraser } from "lucide-react";
 
 interface HalftoneFormValues {
   spacing: number;

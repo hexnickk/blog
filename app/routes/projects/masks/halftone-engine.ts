@@ -84,9 +84,8 @@ export function generateHalftone(
   canvas.width = img.width;
   canvas.height = img.height;
 
-  // Fill base canvas with background color
-  ctx.fillStyle = params.backgroundColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Clear the canvas first (makes it transparent)
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Sync overlay canvas size and clear it
 
@@ -172,8 +171,9 @@ export function generateHalftone(
         continue;
       }
 
-      // Sample brightness in the cell area
+      // Sample brightness and alpha in the cell area
       let brightnessSum = 0;
+      let alphaSum = 0;
       let pixelCount = 0;
 
       // Sample in the cell area
@@ -197,13 +197,28 @@ export function generateHalftone(
                 imageData.data[i + 1] +
                 imageData.data[i + 2]) /
               3;
+            const alpha = imageData.data[i + 3]; // Alpha channel (0-255)
             brightnessSum += brightness;
+            alphaSum += alpha;
             pixelCount++;
           }
         }
       }
 
       if (pixelCount === 0) continue;
+
+      // Calculate average alpha and skip if mostly transparent
+      const avgAlpha = alphaSum / pixelCount;
+      if (avgAlpha < 128) continue; // Skip if more than 50% transparent
+
+      // Draw background color for this cell (only where image is opaque)
+      ctx.fillStyle = params.backgroundColor;
+      ctx.fillRect(
+        rotatedX - params.cellSize / 2,
+        rotatedY - params.cellSize / 2,
+        params.cellSize,
+        params.cellSize,
+      );
 
       let avgBrightness = brightnessSum / pixelCount;
 
