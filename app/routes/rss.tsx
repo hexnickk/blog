@@ -30,7 +30,10 @@ function postsToRssItems(posts: Content.Post[]) {
 }
 
 export async function loader() {
-  const posts = await Content.listAll();
+  const entries = await Content.listAll();
+  const posts = entries.filter(
+    (entry): entry is Content.Post => entry.type === "post",
+  );
   const body = postsToRssItems(posts);
 
   const response = new Response(body);

@@ -15,6 +15,7 @@ export namespace Content {
     declare description: string;
     declare date: Date;
     declare content: string;
+    declare lang: "en" | "ru";
 
     static _validator = z.object({
       type: z.literal("post"),
@@ -31,6 +32,7 @@ export namespace Content {
         )
         .transform((dateStr) => new Date(dateStr)),
       content: z.string(),
+      lang: z.enum(["en", "ru"]).default("en"),
     });
 
     static fromRaw(raw: unknown) {
@@ -45,6 +47,7 @@ export namespace Content {
     declare title: string;
     declare description?: string;
     declare date: Date;
+    declare lang: "en" | "ru";
 
     static _validator = z.object({
       type: z.literal("link"),
@@ -58,6 +61,7 @@ export namespace Content {
           "Invalid ISO date format",
         )
         .transform((dateStr) => new Date(dateStr)),
+      lang: z.enum(["en", "ru"]).default("en"),
     });
 
     static fromRaw(raw: unknown) {
@@ -96,6 +100,7 @@ export namespace Content {
               title: metadata.title,
               description: metadata.description,
               date: metadata.date,
+              lang: metadata.lang ?? "en",
             });
           case "post":
             return Post.fromRaw({
@@ -107,6 +112,7 @@ export namespace Content {
               description: metadata.description,
               date: metadata.date,
               content: String(vFile),
+              lang: metadata.lang ?? "en",
             });
           default:
             throw new Error(`Unknown type: ${metadata.type}`);

@@ -1,6 +1,6 @@
 import type { Content } from "app/modules/content";
 import { useEffect, useState, type ComponentProps } from "react";
-import { Link } from "react-router";
+import { CardLink } from "./ui/card-link";
 import { H3, Muted, P } from "./ui/typography";
 
 export type LinkPreviewProps = ComponentProps<"a"> & {
@@ -15,20 +15,22 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
   }, [link.date]);
 
   return (
-    <Link to={link.href} className="group" target="_blank" {...rest}>
-      <div className="mb-2 flex items-start justify-between">
+    <CardLink to={link.href} target="_blank" {...rest}>
+      <div className="flex items-start justify-between gap-4">
         <div className="flex items-baseline">
-          <H3 className="text-foreground/80 group-hover:text-foreground underline decoration-dotted underline-offset-4">
-            {link.title}
-          </H3>
+          <H3 className="text-black group-hover:text-white">{link.title}</H3>
         </div>
-        <Muted>{date != null && date.toLocaleDateString()}</Muted>
+        <Muted className="shrink-0 group-hover:text-white">
+          {date != null && date.toLocaleDateString()}
+        </Muted>
       </div>
       {link.description && (
-        <div className="ml-4">
-          <P className="whitespace-pre-wrap">{link.description}</P>
+        <div className="ml-6">
+          <P className="whitespace-pre-wrap group-hover:text-white">
+            {link.description}
+          </P>
         </div>
       )}
-    </Link>
+    </CardLink>
   );
 }

@@ -6,7 +6,7 @@ import {
 } from "react-router";
 
 const linkVariants = cva(
-  "text-foreground/80 underline underline-offset-4 decoration-dotted hover:text-foreground hover:decoration",
+  "text-foreground font-bold underline underline-offset-4 decoration-solid decoration-[2px] transition-all hover:bg-black hover:text-white hover:no-underline px-1",
   {
     variants: {},
     defaultVariants: {},
