@@ -18,8 +18,8 @@ export default function Projects() {
         <section className="gap-6">
           <H2>Projects</H2>
           <div className="mt-6 ml-6">
-            <ul className="list-disc space-y-4">
-              <li>
+            <div className="flex flex-1 flex-col gap-6 md:gap-8">
+              <div>
                 <Link to="/projects/masks" className="font-semibold">
                   Masks
                 </Link>
@@ -27,8 +27,8 @@ export default function Projects() {
                 <span className="text-gray-700">
                   Interactive halftone mask generator
                 </span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </section>
       </div>

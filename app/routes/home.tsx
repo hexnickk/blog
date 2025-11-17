@@ -43,7 +43,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <P>
               Let's be friends on{" "}
               <Link to="https://x.com/hexnickk" target="_blank">
-                Twitter (en)
+                Twitter
+              </Link>
+              ,
+              <Link to="https://www.linkedin.com/in/hexnickk/" target="_blank">
+                LinkedIn
               </Link>
               {showRussian && (
                 <>
