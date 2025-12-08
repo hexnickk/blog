@@ -1,11 +1,3 @@
 .DS_Store
-/node_modules/
-
-# React Router
-/.react-router/
-/build/
-
+node_modules
 .env
-
-# Published content
-public/content

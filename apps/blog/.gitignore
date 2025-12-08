@@ -1,0 +1,6 @@
+# React Router
+/.react-router/
+/build/
+
+# Published content
+public/content
