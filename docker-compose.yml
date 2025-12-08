@@ -2,5 +2,6 @@ version: '3.8'
 services:
   blog:
     build: ./apps/blog
-    ports:
-      - "3000:3000"
+
+  simplesign:
+    build: ./apps/simplesign
