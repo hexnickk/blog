@@ -1,11 +1,11 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 WORKDIR /app
-
-COPY ./package.json package-lock.json .
+COPY package.json package-lock.json .
 RUN npm ci
-
 COPY . .
 RUN npm run build
 
-EXPOSE 3000
-CMD ["npm", "run", "start"]
+FROM caddy:2-alpine
+COPY --from=build /app/dist /srv
+COPY Caddyfile /etc/caddy/Caddyfile
+EXPOSE 80
