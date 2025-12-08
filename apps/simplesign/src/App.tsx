@@ -7,12 +7,12 @@ import { Index } from './Index'
 
 const queryClient = new QueryClient()
 
-const projectId = 'b6647b9b137e8e54fcad2c8343305a93'
+const projectId = '7131b44ae86375400bbad818698ec2c3'
 
 const metadata = {
   name: 'Simplesign',
   description: 'Simplesign App',
-  url: 'http://localhost:5173',
+  url: window.location.origin,
   icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
