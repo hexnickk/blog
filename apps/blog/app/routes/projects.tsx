@@ -28,6 +28,15 @@ export default function Projects() {
                   Interactive halftone mask generator
                 </span>
               </div>
+              <div>
+                <Link to="https://simplesign.hexnickk.sh" className="font-semibold">
+                  SimpleSign
+                </Link>
+                {" - "}
+                <span className="text-gray-700">
+                  Minimalistic app to sign messages with your Ethereum wallet
+                </span>
+              </div>
             </div>
           </div>
         </section>
