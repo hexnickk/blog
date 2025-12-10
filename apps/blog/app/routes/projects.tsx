@@ -20,7 +20,7 @@ export default function Projects() {
           <div className="mt-6 ml-6">
             <div className="flex flex-1 flex-col gap-6 md:gap-8">
               <div>
-                <Link to="/projects/masks" className="font-semibold">
+                <Link to="https://masks.hexnickk.sh" className="font-semibold">
                   Masks
                 </Link>
                 {" - "}

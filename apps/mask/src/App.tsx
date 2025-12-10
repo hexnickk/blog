@@ -1,23 +1,21 @@
-import { H1 } from "app/components/ui/typography";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { ShapeType, DitherPattern } from "./constants";
 import {
   generateHalftone,
-  eraseAtPoint,
-  clearEraseMask,
   exportMergedCanvas,
 } from "./halftone-engine";
-import { Button } from "app/components/ui/button";
-import { Label } from "app/components/ui/label";
-import { Slider } from "app/components/ui/slider";
+import { H1 } from "./components/typography";
+import { Button } from "./components/ui/button";
+import { Label } from "./components/ui/label";
+import { Slider } from "./components/ui/slider";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "app/components/ui/select";
+} from "./components/ui/select";
 
 interface HalftoneFormValues {
   spacing: number;
@@ -36,7 +34,7 @@ interface HalftoneFormValues {
   angle: number;
 }
 
-export default function MasksPage() {
+export function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const eraseMaskRef = useRef<HTMLCanvasElement>(null);
@@ -64,11 +62,6 @@ export default function MasksPage() {
 
   // Watch all form values
   const formValues = watch();
-
-  // Canvas interaction state (not form-related)
-  const [eraseMode, setEraseMode] = useState(false);
-  const [brushSize, setBrushSize] = useState(20);
-  const [isDrawing, setIsDrawing] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -123,149 +116,6 @@ export default function MasksPage() {
     link.click();
   };
 
-  const erase = useCallback(
-    (x: number, y: number) => {
-      const eraseMask = eraseMaskRef.current;
-      const overlayCanvas = overlayCanvasRef.current;
-      if (!eraseMask || !overlayCanvas) return;
-
-      eraseAtPoint(eraseMask, overlayCanvas, x, y, brushSize);
-    },
-    [brushSize],
-  );
-
-  const getCanvasCoordinates = useCallback(
-    (
-      e: React.MouseEvent<HTMLCanvasElement>,
-    ): { x: number; y: number } | null => {
-      const overlayCanvas = overlayCanvasRef.current;
-      if (!overlayCanvas) return null;
-      const rect = overlayCanvas.getBoundingClientRect();
-
-      // Account for object-contain: calculate actual canvas display size and offset
-      const canvasRatio = overlayCanvas.width / overlayCanvas.height;
-      const containerRatio = rect.width / rect.height;
-
-      let displayWidth, displayHeight, offsetX, offsetY;
-
-      if (containerRatio > canvasRatio) {
-        // Container is wider - canvas is limited by height (pillarboxing)
-        displayHeight = rect.height;
-        displayWidth = displayHeight * canvasRatio;
-        offsetX = (rect.width - displayWidth) / 2;
-        offsetY = 0;
-      } else {
-        // Container is taller - canvas is limited by width (letterboxing)
-        displayWidth = rect.width;
-        displayHeight = displayWidth / canvasRatio;
-        offsetX = 0;
-        offsetY = (rect.height - displayHeight) / 2;
-      }
-
-      // Calculate coordinates relative to the actual canvas display area
-      const relativeX = e.clientX - rect.left - offsetX;
-      const relativeY = e.clientY - rect.top - offsetY;
-
-      // Scale to canvas coordinates
-      return {
-        x: (relativeX / displayWidth) * overlayCanvas.width,
-        y: (relativeY / displayHeight) * overlayCanvas.height,
-      };
-    },
-    [],
-  );
-
-  const getCanvasCoordinatesFromTouch = useCallback(
-    (
-      e: React.TouchEvent<HTMLCanvasElement>,
-    ): { x: number; y: number } | null => {
-      const overlayCanvas = overlayCanvasRef.current;
-      if (!overlayCanvas) return null;
-      const rect = overlayCanvas.getBoundingClientRect();
-      const touch = e.touches[0] || e.changedTouches[0];
-      if (!touch) return null;
-
-      // Account for object-contain: calculate actual canvas display size and offset
-      const canvasRatio = overlayCanvas.width / overlayCanvas.height;
-      const containerRatio = rect.width / rect.height;
-
-      let displayWidth, displayHeight, offsetX, offsetY;
-
-      if (containerRatio > canvasRatio) {
-        // Container is wider - canvas is limited by height (pillarboxing)
-        displayHeight = rect.height;
-        displayWidth = displayHeight * canvasRatio;
-        offsetX = (rect.width - displayWidth) / 2;
-        offsetY = 0;
-      } else {
-        // Container is taller - canvas is limited by width (letterboxing)
-        displayWidth = rect.width;
-        displayHeight = displayWidth / canvasRatio;
-        offsetX = 0;
-        offsetY = (rect.height - displayHeight) / 2;
-      }
-
-      // Calculate coordinates relative to the actual canvas display area
-      const relativeX = touch.clientX - rect.left - offsetX;
-      const relativeY = touch.clientY - rect.top - offsetY;
-
-      // Scale to canvas coordinates
-      return {
-        x: (relativeX / displayWidth) * overlayCanvas.width,
-        y: (relativeY / displayHeight) * overlayCanvas.height,
-      };
-    },
-    [],
-  );
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!eraseMode) return;
-      setIsDrawing(true);
-      const coords = getCanvasCoordinates(e);
-      if (coords) erase(coords.x, coords.y);
-    },
-    [eraseMode, getCanvasCoordinates, erase],
-  );
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!eraseMode || !isDrawing) return;
-      const coords = getCanvasCoordinates(e);
-      if (coords) erase(coords.x, coords.y);
-    },
-    [eraseMode, isDrawing, getCanvasCoordinates, erase],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDrawing(false);
-  }, []);
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent<HTMLCanvasElement>) => {
-      if (!eraseMode) return;
-      e.preventDefault(); // Prevent scrolling while erasing
-      setIsDrawing(true);
-      const coords = getCanvasCoordinatesFromTouch(e);
-      if (coords) erase(coords.x, coords.y);
-    },
-    [eraseMode, getCanvasCoordinatesFromTouch, erase],
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent<HTMLCanvasElement>) => {
-      if (!eraseMode || !isDrawing) return;
-      e.preventDefault(); // Prevent scrolling while erasing
-      const coords = getCanvasCoordinatesFromTouch(e);
-      if (coords) erase(coords.x, coords.y);
-    },
-    [eraseMode, isDrawing, getCanvasCoordinatesFromTouch, erase],
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    setIsDrawing(false);
-  }, []);
-
   // Wrapper to call the extracted generateHalftone with current form values
   const runGeneration = useCallback(() => {
     const canvas = canvasRef.current;
@@ -291,14 +141,6 @@ export default function MasksPage() {
       angle: formValues.angle,
     });
   }, [formValues]);
-
-  const handleClearEdits = useCallback(() => {
-    const eraseMask = eraseMaskRef.current;
-    if (!eraseMask) return;
-
-    clearEraseMask(eraseMask);
-    runGeneration();
-  }, [runGeneration]);
 
   // Load default image on mount
   useEffect(() => {
@@ -342,62 +184,11 @@ export default function MasksPage() {
               className="absolute top-0 left-0 max-h-[50vh] w-full md:max-h-[70vh]"
               style={{
                 objectFit: "contain",
-                cursor: eraseMode ? "crosshair" : "default",
-                touchAction: eraseMode ? "none" : "auto",
               }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onTouchCancel={handleTouchEnd}
             />
             {/* Hidden erase mask - tracks erased areas */}
             <canvas ref={eraseMaskRef} className="hidden" />
           </div>
-
-          {/* Canvas Controls - compact on mobile */}
-          {/* <div className="mt-2 md:mt-4">
-            <div className="mb-2 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center md:mb-3">
-              <Button
-                variant={eraseMode ? "default" : "outline"}
-                size="sm"
-                onClick={() => setEraseMode(!eraseMode)}
-                className="w-full sm:w-auto"
-              >
-                <Eraser className="mr-2 h-4 w-4" />
-                Erase Mode
-              </Button>
-
-              <div className="flex flex-1 items-center gap-2">
-                <Label className="flex flex-1 items-center gap-2">
-                  <span className="text-xs whitespace-nowrap md:text-sm">
-                    Brush: {brushSize}px
-                  </span>
-                  <Slider
-                    min={5}
-                    max={100}
-                    step={1}
-                    value={[brushSize]}
-                    onValueChange={(value) => setBrushSize(value[0])}
-                    disabled={!eraseMode}
-                    className="flex-1"
-                  />
-                </Label>
-              </div>
-
-              <Button
-                onClick={handleClearEdits}
-                variant="outline"
-                size="sm"
-                className="w-full sm:w-auto"
-              >
-                Clear Edits
-              </Button>
-            </div>
-          </div> */}
         </div>
 
         {/* Controls Section - scrollable with max height on mobile */}

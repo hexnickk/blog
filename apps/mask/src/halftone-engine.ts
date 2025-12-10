@@ -4,7 +4,7 @@ import {
   SHAPE_SCALE_FACTORS,
   DITHER_MATRICES,
 } from "./constants";
-import { interpolateColor, resizeCanvas } from "./utils";
+import { interpolateColor, resizeCanvas } from "./lib/utils";
 
 export interface HalftoneParams {
   cellSize: number;
@@ -306,40 +306,6 @@ export function generateHalftone(
     overlayCtx.drawImage(eraseMask, 0, 0);
     overlayCtx.globalCompositeOperation = "source-over";
   }
-}
-
-// Erase functionality
-export function eraseAtPoint(
-  eraseMask: HTMLCanvasElement,
-  overlayCanvas: HTMLCanvasElement,
-  x: number,
-  y: number,
-  brushSize: number,
-): void {
-  const maskCtx = eraseMask.getContext("2d");
-  const overlayCtx = overlayCanvas.getContext("2d");
-  if (!maskCtx || !overlayCtx) return;
-
-  // Draw white circles on the erase mask (white = erased area)
-  maskCtx.fillStyle = "white";
-  maskCtx.beginPath();
-  maskCtx.arc(x, y, brushSize, 0, Math.PI * 2);
-  maskCtx.fill();
-
-  // Immediately apply to overlay for visual feedback
-  overlayCtx.globalCompositeOperation = "destination-out";
-  overlayCtx.fillStyle = "white";
-  overlayCtx.beginPath();
-  overlayCtx.arc(x, y, brushSize, 0, Math.PI * 2);
-  overlayCtx.fill();
-  overlayCtx.globalCompositeOperation = "source-over";
-}
-
-// Clear erase mask
-export function clearEraseMask(eraseMask: HTMLCanvasElement): void {
-  const ctx = eraseMask.getContext("2d");
-  if (!ctx) return;
-  ctx.clearRect(0, 0, eraseMask.width, eraseMask.height);
 }
 
 // Export merged canvas (base + overlay)
