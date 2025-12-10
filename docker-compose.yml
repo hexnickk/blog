@@ -5,3 +5,6 @@ services:
 
   simplesign:
     build: ./apps/simplesign
+
+  mask:
+    build: ./apps/mask
