@@ -5,5 +5,4 @@ export default [
   route("/posts/:slug", "routes/posts/$slug.tsx"),
   route("/rss.xml", "routes/rss.tsx"),
   route("/projects", "routes/projects.tsx"),
-  route("/projects/masks", "routes/projects/masks/masks.page.tsx"),
 ] satisfies RouteConfig;
