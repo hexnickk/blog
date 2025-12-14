@@ -33,6 +33,7 @@ async function syncAssets() {
 }
 
 export default {
+  ssr: false,
   prerender: async ({ getStaticPaths }) => {
     await syncAssets();
 
