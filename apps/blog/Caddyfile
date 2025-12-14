@@ -1,4 +1,4 @@
-:3000 {
+:80 {
 	redir /wishlist https://docs.google.com/document/d/1FrCw1a126xnkOn7OUoBISRwXkR4xBexSnAh3TIiM4v0 temporary
 
 	root * /srv

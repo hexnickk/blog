@@ -10,4 +10,4 @@ RUN npm run build
 FROM caddy:2-alpine
 COPY --from=builder /app/build/client /srv
 COPY Caddyfile /etc/caddy/Caddyfile
-EXPOSE 3000
+EXPOSE 80
