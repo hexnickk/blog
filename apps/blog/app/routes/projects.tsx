@@ -29,7 +29,10 @@ export default function Projects() {
                 </span>
               </div>
               <div>
-                <Link to="https://simplesign.hexnickk.sh" className="font-semibold">
+                <Link
+                  to="https://simplesign.hexnickk.sh"
+                  className="font-semibold"
+                >
                   SimpleSign
                 </Link>
                 {" - "}

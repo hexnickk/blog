@@ -13,10 +13,10 @@ const cardLinkVariants = cva(
   },
 );
 
-export type CardLinkProps = RouterLinkProps &
+export type BlockLinkProps = RouterLinkProps &
   VariantProps<typeof cardLinkVariants>;
 
-export function CardLink({ className, ...props }: CardLinkProps) {
+export function BlockLink({ className, ...props }: BlockLinkProps) {
   return (
     <RouterLink className={cn(cardLinkVariants({ className }))} {...props} />
   );

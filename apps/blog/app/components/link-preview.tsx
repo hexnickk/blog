@@ -1,6 +1,6 @@
 import type { Content } from "app/modules/content";
 import { useEffect, useState, type ComponentProps } from "react";
-import { CardLink } from "./ui/card-link";
+import { BlockLink } from "./ui/block-link";
 import { H3, Muted, P } from "./ui/typography";
 
 export type LinkPreviewProps = ComponentProps<"a"> & {
@@ -15,7 +15,7 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
   }, [link.date]);
 
   return (
-    <CardLink to={link.href} target="_blank" {...rest}>
+    <BlockLink to={link.href} target="_blank" {...rest}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-baseline">
           <H3 className="text-black group-hover:text-white">{link.title}</H3>
@@ -31,6 +31,6 @@ export function LinkPreview({ link, ...rest }: LinkPreviewProps) {
           </P>
         </div>
       )}
-    </CardLink>
+    </BlockLink>
   );
 }

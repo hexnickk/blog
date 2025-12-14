@@ -1,6 +1,41 @@
 import { type ComponentProps } from "react";
 import { cn } from "app/lib/utils";
-import { Navigation } from "app/components/navigation";
+import { useLocation } from "react-router";
+import { Link } from "./ui/link";
+import { LanguageToggle } from "./language-toggle";
+
+export function Navigation() {
+  const { pathname } = useLocation();
+
+  return (
+    <nav className="relative mb-8 flex items-center justify-center">
+      <div className="flex items-center gap-4">
+        <Link
+          to="/"
+          className={cn(
+            "font-semibold",
+            pathname === "/" && "bg-black text-white",
+          )}
+        >
+          Blog
+        </Link>
+        <span className="text-gray-400">/</span>
+        <Link
+          to="/projects"
+          className={cn(
+            "font-semibold",
+            pathname === "/projects" && "bg-black text-white",
+          )}
+        >
+          Projects
+        </Link>
+      </div>
+      <div className="absolute right-0">
+        <LanguageToggle />
+      </div>
+    </nav>
+  );
+}
 
 export type LayoutProps = ComponentProps<"div">;
 
@@ -13,12 +48,10 @@ export function Layout({ children, className, ...rest }: LayoutProps) {
       )}
       {...rest}
     >
-      {/* header */}
-      <main className="flex-1 border-[5px] border-black p-8 md:p-16">
+      <main>
         <Navigation />
         {children}
       </main>
-      {/* <footer></footer> */}
     </div>
   );
 }
