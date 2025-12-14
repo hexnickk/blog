@@ -8,6 +8,6 @@ RUN npm run build
 
 # Production stage
 FROM caddy:2-alpine
-COPY --from=builder /app/build/client /srv
+COPY --from=builder /app/build /srv
 COPY Caddyfile /etc/caddy/Caddyfile
 EXPOSE 3000
