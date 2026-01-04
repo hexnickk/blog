@@ -8,3 +8,6 @@ services:
 
   mask:
     build: ./apps/mask
+
+  foundry:
+    build: ./apps/foundry
