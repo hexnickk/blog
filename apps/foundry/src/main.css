@@ -1,0 +1,138 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Neobrutalist: No rounded corners */
+  --radius: 0px;
+
+  /* Warm cream background */
+  --background: #faf9f6;
+  --foreground: #1a1a1a;
+
+  /* Cards are white with hard edges */
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+
+  /* Primary: dark for buttons */
+  --primary: #1a1a1a;
+  --primary-foreground: #ffffff;
+
+  /* Secondary: subtle cream */
+  --secondary: #f5f4f0;
+  --secondary-foreground: #1a1a1a;
+
+  /* Muted text */
+  --muted: #f5f4f0;
+  --muted-foreground: #6b6b6b;
+
+  /* Accent: warm yellow - use sparingly */
+  --accent: #ffcb47;
+  --accent-foreground: #1a1a1a;
+
+  /* States */
+  --destructive: #dc2626;
+  --success: #16a34a;
+
+  /* Borders: 2px solid black */
+  --border: #1a1a1a;
+  --input: #1a1a1a;
+  --ring: #ffcb47;
+
+  /* Charts */
+  --chart-1: #1a1a1a;
+  --chart-2: #ffcb47;
+  --chart-3: #6b6b6b;
+  --chart-4: #dc2626;
+  --chart-5: #16a34a;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #1a1a1a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ffcb47;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #1a1a1a;
+  --sidebar-ring: #ffcb47;
+}
+
+/* No dark mode - neobrutalist design is light only */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  /* Hard shadows - neobrutalist signature */
+  .shadow-brutal {
+    box-shadow: 4px 4px 0 #1a1a1a;
+  }
+  .shadow-brutal-sm {
+    box-shadow: 2px 2px 0 #1a1a1a;
+  }
+  .shadow-brutal-lg {
+    box-shadow: 6px 6px 0 #1a1a1a;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.1s ease;
+  }
+  .hover-lift:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #1a1a1a;
+  }
+  .hover-lift:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 #1a1a1a;
+  }
+}
