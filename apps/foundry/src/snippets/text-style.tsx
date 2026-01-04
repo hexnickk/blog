@@ -59,7 +59,7 @@ export function SnippetTextStyle() {
     getColorStyles(),
     bgColor && `background-color: ${bgColor}`,
     margin && `margin: ${margin}px`,
-    padding && `padding: ${padding}px`,
+    colorMode === "single" && padding && `padding: ${padding}px`,
     bold && "font-weight: bold",
     italic && "font-style: italic",
     decorations && `text-decoration: ${decorations}`,
@@ -217,21 +217,23 @@ export function SnippetTextStyle() {
 
         {/* Spacing */}
         <div className="flex gap-6">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="style-padding" className="text-sm font-medium">
-              Inner Spacing (px)
-            </label>
-            <Input
-              id="style-padding"
-              type="number"
-              min={0}
-              max={100}
-              step={1}
-              value={padding}
-              onChange={(e) => setPadding(Number(e.target.value))}
-              className="w-32"
-            />
-          </div>
+          {colorMode === "single" && (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="style-padding" className="text-sm font-medium">
+                Inner Spacing (px)
+              </label>
+              <Input
+                id="style-padding"
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={padding}
+                onChange={(e) => setPadding(Number(e.target.value))}
+                className="w-32"
+              />
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <label htmlFor="style-margin" className="text-sm font-medium">
               Outer Spacing (px)
