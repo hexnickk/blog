@@ -19,3 +19,4 @@
 1.  **Images & Icons:**
     - Use icons from the `"lucide-react"` package. **Do not** output raw `<svg>` for icons.
     - When using `new Image()` with `<canvas>`, set `crossOrigin = "anonymous"`.
+
