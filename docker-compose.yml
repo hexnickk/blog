@@ -3,11 +3,11 @@ services:
   blog:
     build: ./apps/blog
 
-  simplesign:
-    build: ./apps/simplesign
+  # simplesign:
+  #   build: ./apps/simplesign
 
-  mask:
-    build: ./apps/mask
+  # mask:
+  #   build: ./apps/mask
 
-  foundry:
-    build: ./apps/foundry
+  # foundry:
+  #   build: ./apps/foundry
