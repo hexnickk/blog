@@ -1,7 +1,10 @@
 version: '3.8'
 services:
   blog:
-    build: ./apps/blog
+    build:
+      context: ./apps/blog
+      args:
+        VITE_HOST_URL: ${VITE_HOST_URL:?VITE_HOST_URL is required for the blog build}
 
   # simplesign:
   #   build: ./apps/simplesign
