@@ -1,16 +1,6 @@
-version: '3.8'
 services:
   blog:
     build:
-      context: ./apps/blog
+      context: .
       args:
         VITE_HOST_URL: ${VITE_HOST_URL:?VITE_HOST_URL is required for the blog build}
-
-  # simplesign:
-  #   build: ./apps/simplesign
-
-  # mask:
-  #   build: ./apps/mask
-
-  # foundry:
-  #   build: ./apps/foundry
