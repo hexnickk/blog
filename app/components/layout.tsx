@@ -1,30 +1,32 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
-import { Link } from "react-router";
 
 const styles = stylex.create({
   layout: {
     maxWidth: 720,
     marginInline: "auto",
-    padding: "24px 16px",
+    padding: "clamp(24px, 8vh, 96px) 16px 32px",
   },
-  navigation: { display: "flex", gap: 16, marginBottom: 24 },
+  contacts: { marginTop: 40 },
 });
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <div {...stylex.props(styles.layout)}>
-      <header>
-        <nav aria-label="Main navigation" {...stylex.props(styles.navigation)}>
-          <Link to="/" reloadDocument>
-            Home
-          </Link>
-          <Link to="/pages/1" reloadDocument>
-            All posts
-          </Link>
-        </nav>
-      </header>
       <main>{children}</main>
+      <footer>
+        <nav aria-label="Contact links" {...stylex.props(styles.contacts)}>
+          <a href="mailto:h3yniko@gmail.com">Email</a>
+          {", "}
+          <a href="https://x.com/h3yniko" target="_blank" rel="noopener noreferrer">
+            X/Twitter
+          </a>
+          {", "}
+          <a href="https://www.linkedin.com/in/heyniko" target="_blank" rel="noopener noreferrer">
+            LinkedIn
+          </a>
+        </nav>
+      </footer>
     </div>
   );
 }

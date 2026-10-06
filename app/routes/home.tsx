@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { Route } from "./+types/home";
-import { links } from "app/modules/content";
+import { links, type ContentLink } from "app/modules/content";
 import { Layout } from "app/components/layout";
 import { Link } from "react-router";
 
@@ -15,9 +15,14 @@ export function meta({ data }: Route.MetaArgs) {
   ];
 }
 
-export function loader({ params }: Route.LoaderArgs) {
-  const totalPages = Math.max(1, Math.ceil(links.length / 15));
-  const page = params.page === undefined ? null : Number(params.page);
+export function loader({ params, request }: Route.LoaderArgs) {
+  const { pathname } = new URL(request.url);
+  const isHome = pathname === "/";
+  const type = pathname.startsWith("/projects") ? "project" : "post";
+  const category = type === "project" ? "projects" : "posts";
+  const filteredLinks = links.filter((link) => link.type === type);
+  const totalPages = Math.max(1, Math.ceil(filteredLinks.length / 15));
+  const page = isHome ? null : Number(params.page);
   if (
     page !== null &&
     (!Number.isSafeInteger(page) || page < 1 || page > totalPages || params.page !== String(page))
@@ -25,70 +30,106 @@ export function loader({ params }: Route.LoaderArgs) {
     throw new Response("Page not found", { status: 404 });
   }
   return {
-    entries: page === null ? links.slice(0, 5) : links.slice((page - 1) * 15, page * 15),
+    entries: (isHome
+      ? links.slice(0, 10)
+      : filteredLinks.slice(((page ?? 1) - 1) * 15, (page ?? 1) * 15)
+    ).map(({ title: _title, ...entry }) => entry),
+    isHome,
+    category,
     page,
     totalPages,
   };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { entries, page, totalPages } = loaderData;
+  const { entries, page, totalPages, category, isHome } = loaderData;
+  const categoryBase = category === "projects" ? "/projects" : "/posts";
   return (
     <Layout>
-      {page === null && (
+      {!isHome && (
         <p>
-          I'm Nick, a software engineer, who dives deep into the unknown. Welcome to the journey!
+          <Link to="/" reloadDocument>
+            Home
+          </Link>
         </p>
       )}
+      {isHome && <p>Hey, I'm Nik Kozlov, nice to meet you!</p>}
       <section>
-        <h2>{page === null ? "Latest posts" : "All posts"}</h2>
-        <ul>
-          {entries.map((link) => (
-            <li key={link.href} {...stylex.props(pageStyles.entry)}>
-              <div {...stylex.props(pageStyles.postRow)}>
+        {!isHome && <h2>{category === "projects" ? "Projects" : "Posts"}</h2>}
+        <EntryList entries={entries} />
+        {isHome ? (
+          <p>
+            See older posts{" "}
+            <Link to="/posts/pages/1" reloadDocument>
+              here
+            </Link>
+            , and projects{" "}
+            <Link to="/projects/pages/1" reloadDocument>
+              here
+            </Link>
+            .
+          </p>
+        ) : (
+          page !== null && (
+            <nav aria-label="Pagination" {...stylex.props(pageStyles.pagination)}>
+              {page > 1 && (
                 <Link
-                  to={link.href}
-                  target={/^https?:\/\//.test(link.href) ? "_blank" : undefined}
+                  to={`${categoryBase}/pages/${page - 1}`}
+                  rel="prev"
+                  aria-label={`Newer ${category}`}
                   reloadDocument
                 >
-                  {link.title}
+                  {"<<"}
                 </Link>
-                <small {...stylex.props(pageStyles.date)}>
-                  <time dateTime={link.date}>
-                    {new Date(link.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      timeZone: "UTC",
-                    })}
-                  </time>
-                </small>
-              </div>
-              {link.description && (
-                <p {...stylex.props(pageStyles.description)}>{link.description}</p>
               )}
-            </li>
-          ))}
-        </ul>
-        {page !== null && (
-          <nav aria-label="Pagination" {...stylex.props(pageStyles.pagination)}>
-            {page > 1 && (
-              <Link to={`/pages/${page - 1}`} rel="prev" aria-label="Newer posts" reloadDocument>
-                {"<<"}
-              </Link>
-            )}
-            <span>
-              Page {page} of {totalPages}
-            </span>
-            {page < totalPages && (
-              <Link to={`/pages/${page + 1}`} rel="next" aria-label="Older posts" reloadDocument>
-                {">>"}
-              </Link>
-            )}
-          </nav>
+              <span>
+                Page {page} of {totalPages}
+              </span>
+              {page < totalPages && (
+                <Link
+                  to={`${categoryBase}/pages/${page + 1}`}
+                  rel="next"
+                  aria-label={`Older ${category}`}
+                  reloadDocument
+                >
+                  {">>"}
+                </Link>
+              )}
+            </nav>
+          )
         )}
       </section>
     </Layout>
+  );
+}
+
+function EntryList({ entries }: { entries: Omit<ContentLink, "title">[] }) {
+  return (
+    <ul>
+      {entries.map((link) => (
+        <li key={link.href} {...stylex.props(pageStyles.entry)}>
+          <div {...stylex.props(pageStyles.postRow)}>
+            <Link
+              to={link.href}
+              target={/^https?:\/\//.test(link.href) ? "_blank" : undefined}
+              reloadDocument
+            >
+              {links.find((entry) => entry.href === link.href)?.title}
+            </Link>
+            <small {...stylex.props(pageStyles.date)}>
+              <time dateTime={link.date}>
+                {new Date(link.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })}
+              </time>
+            </small>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -101,7 +142,6 @@ const pageStyles = stylex.create({
     gap: 16,
   },
   date: { flexShrink: 0, whiteSpace: "nowrap" },
-  description: { marginBlock: "4px 0", whiteSpace: "pre-wrap" },
   pagination: {
     display: "flex",
     flexWrap: "wrap",

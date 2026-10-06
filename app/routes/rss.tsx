@@ -1,4 +1,4 @@
-import { links } from "app/modules/content";
+import { links, titleText } from "app/modules/content";
 
 function escapeXml(value: string) {
   return value
@@ -21,10 +21,9 @@ export function loader() {
     .map((link) => {
       const href = escapeXml(new URL(link.href, import.meta.env.VITE_HOST_URL).href);
       return `<item>
-    <title>${escapeXml(link.title)}</title>
+    <title>${escapeXml(titleText(link.title))}</title>
     <link>${href}</link>
     <guid isPermaLink="true">${href}</guid>
-    <description>${escapeXml(link.description ?? "")}</description>
     <pubDate>${new Date(link.date).toUTCString()}</pubDate>
   </item>`;
     })
