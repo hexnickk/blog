@@ -1,19 +1,13 @@
 import type { Config } from "@react-router/dev/config";
-import { Content } from "./app/modules/content";
-import { syncAssets } from "./app/lib/sync-assets";
+import { links } from "./app/modules/content";
 
 export default {
   ssr: false,
-  prerender: async () => {
-    const posts = await Content.listPublic();
+  prerender: ({ getStaticPaths }) => {
+    const totalPages = Math.max(1, Math.ceil(links.length / 15));
     return [
-      "/",
-      "/rss.xml",
-      "/posts/$slug",
-      ...posts.filter((post) => post.type === "post").map((post) => `/posts/${post.slug}`),
+      ...getStaticPaths(),
+      ...Array.from({ length: totalPages }, (_unused, index) => `/pages/${index + 1}`),
     ];
-  },
-  async buildEnd({}) {
-    await syncAssets();
   },
 } satisfies Config;

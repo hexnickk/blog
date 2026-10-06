@@ -1,20 +1,5 @@
 {
   "name": "blog",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
-  "remoteUser": "node",
-  "forwardPorts": [5173],
-  "portsAttributes": {
-    "5173": {
-      "label": "blog"
-    }
-  },
-  "mounts": [
-    "source=${localWorkspaceFolderBasename}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
-  ],
-  "postCreateCommand": "sudo chown node:node node_modules && npm ci && ./scripts/bootstrap.sh",
-  "customizations": {
-    "vscode": {
-      "extensions": ["-dbaeumer.vscode-eslint", "oxc.oxc-vscode"]
-    }
-  }
+  "postCreateCommand": "npm ci && ./.devcontainer/bootstrap.sh"
 }

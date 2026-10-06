@@ -1,40 +1,35 @@
-import { Config } from "app/modules/config";
-import { Content } from "app/modules/content";
-import { Env } from "app/modules/env";
+import { links } from "app/modules/content";
 
-function postToRssItem(post: Content.Post) {
-  return `
-  <item>
-    <title>${post.title}</title>
-    <link>${Env.HOST_URL}/posts/${post.slug}</link>
-    <guid isPermaLink="true">${Env.HOST_URL}/posts/${post.slug}</guid>
-    <description><![CDATA[${post.description}]]></description>
-    <pubDate>${post.date.toUTCString()}</pubDate>
-  </item>
-`;
+function escapeXml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
 }
 
-function postsToRssItems(posts: Content.Post[]) {
-  const latestPost = posts[0];
-  return `<?xml version="1.0" encoding="UTF-8" ?>
+export function loader() {
+  const body = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>${Config.siteName}</title>
-  <link>${Env.HOST_URL}</link>
-  <description>${Config.siteDescription}</description>
-  <language>en-uk</language>
-  <lastBuildDate>${(latestPost?.date ?? new Date()).toUTCString()}</lastBuildDate>
-  ${posts.map(postToRssItem).join("\n")}
+  <title>Nick K blog</title>
+  <link>${escapeXml(import.meta.env.VITE_HOST_URL)}</link>
+  <description>I'm Nick, a software engineer, who dives deep into the unknown. Welcome to the journey!</description>
+  <lastBuildDate>${new Date(links[0]?.date ?? Date.now()).toUTCString()}</lastBuildDate>
+  ${links
+    .map((link) => {
+      const href = escapeXml(new URL(link.href, import.meta.env.VITE_HOST_URL).href);
+      return `<item>
+    <title>${escapeXml(link.title)}</title>
+    <link>${href}</link>
+    <guid isPermaLink="true">${href}</guid>
+    <description>${escapeXml(link.description ?? "")}</description>
+    <pubDate>${new Date(link.date).toUTCString()}</pubDate>
+  </item>`;
+    })
+    .join("\n")}
 </channel>
 </rss>`;
-}
-
-export async function loader() {
-  const entries = await Content.listAll();
-  const posts = entries.filter((entry): entry is Content.Post => entry.type === "post");
-  const body = postsToRssItems(posts);
-
-  const response = new Response(body);
-  response.headers.set("Content-Type", "application/xml");
-  return response;
+  return new Response(body, { headers: { "Content-Type": "application/xml" } });
 }

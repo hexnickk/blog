@@ -1,8 +1,6 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
-
 export default [
   index("routes/home.tsx"),
-  route("/posts/:slug", "routes/posts/$slug.tsx"),
+  route("/pages/:page", "routes/home.tsx", { id: "paginated-home" }),
   route("/rss.xml", "routes/rss.tsx"),
-  route("/projects", "routes/projects.tsx"),
 ] satisfies RouteConfig;

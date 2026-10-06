@@ -1,45 +1,30 @@
-import { type ComponentProps } from "react";
-import { cn } from "app/lib/utils";
-import { useLocation } from "react-router";
-import { Link } from "./ui/link";
-import { LanguageToggle } from "./language-toggle";
+import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
+import { Link } from "react-router";
 
-export function Navigation() {
-  const { pathname } = useLocation();
+const styles = stylex.create({
+  layout: {
+    maxWidth: 720,
+    marginInline: "auto",
+    padding: "24px 16px",
+  },
+  navigation: { display: "flex", gap: 16, marginBottom: 24 },
+});
 
+export function Layout({ children }: { children: ReactNode }) {
   return (
-    <nav className="relative mb-8 flex items-center justify-center">
-      <div className="flex items-center gap-4">
-        <Link to="/" className={cn("font-semibold", pathname === "/" && "bg-black text-white")}>
-          Blog
-        </Link>
-        <span className="text-gray-400">/</span>
-        <Link
-          to="/projects"
-          className={cn("font-semibold", pathname === "/projects" && "bg-black text-white")}
-        >
-          Projects
-        </Link>
-      </div>
-      <div className="absolute right-0">
-        <LanguageToggle />
-      </div>
-    </nav>
-  );
-}
-
-export type LayoutProps = ComponentProps<"div">;
-
-export function Layout({ children, className, ...rest }: LayoutProps) {
-  return (
-    <div
-      className={cn("m-auto flex min-h-screen max-w-7xl flex-col p-6 md:p-12", className)}
-      {...rest}
-    >
-      <main>
-        <Navigation />
-        {children}
-      </main>
+    <div {...stylex.props(styles.layout)}>
+      <header>
+        <nav aria-label="Main navigation" {...stylex.props(styles.navigation)}>
+          <Link to="/" reloadDocument>
+            Home
+          </Link>
+          <Link to="/pages/1" reloadDocument>
+            All posts
+          </Link>
+        </nav>
+      </header>
+      <main>{children}</main>
     </div>
   );
 }
