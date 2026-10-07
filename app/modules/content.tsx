@@ -16,7 +16,7 @@ export const links: ContentLink[] = (
           <strong>Jib</strong>: CLI tool for deploying apps with Docker
         </>
       ),
-      href: "https://github.com/hexnickk/jib/",
+      href: "https://github.com/h3yniko/jib/",
       date: "2026-03-22",
     },
     {
@@ -27,7 +27,7 @@ export const links: ContentLink[] = (
           <strong>Trusty Tail</strong>: Telegram check-in bot for pet owners and backup contacts
         </>
       ),
-      href: "https://github.com/hexnickk/trusty-tail",
+      href: "https://github.com/h3yniko/trusty-tail",
       date: "2023-12-25",
     },
     {
