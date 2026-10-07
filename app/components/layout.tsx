@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-const styles = stylex.create({
+export const layoutStyles = stylex.create({
   layout: {
     maxWidth: 720,
     marginInline: "auto",
@@ -12,10 +12,10 @@ const styles = stylex.create({
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div {...stylex.props(styles.layout)}>
+    <div {...stylex.props(layoutStyles.layout)}>
       <main>{children}</main>
       <footer>
-        <nav aria-label="Contact links" {...stylex.props(styles.contacts)}>
+        <nav aria-label="Contact links" {...stylex.props(layoutStyles.contacts)}>
           <a href="mailto:h3yniko@gmail.com">Email</a>
           {", "}
           <a href="https://x.com/h3yniko" target="_blank" rel="noopener noreferrer">

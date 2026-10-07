@@ -1,4 +1,5 @@
 import type { Config } from "@react-router/dev/config";
+import { recipes } from "./app/modules/recipes";
 import { links } from "./app/modules/content";
 
 export default {
@@ -6,6 +7,7 @@ export default {
   prerender: ({ getStaticPaths }) => {
     return [
       ...getStaticPaths(),
+      ...recipes.map((recipe) => `/recepies/${recipe.slug}`),
       ...(["post", "project"] as const).flatMap((type) => {
         const count = links.filter((link) => link.type === type).length;
         return Array.from(
