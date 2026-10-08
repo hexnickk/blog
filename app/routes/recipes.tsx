@@ -20,7 +20,7 @@ export default function Recipes() {
         <ul>
           {recipes.map((recipe) => (
             <li key={recipe.slug} {...stylex.props(styles.entry)}>
-              <Link to={`/recepies/${recipe.slug}`} reloadDocument>
+              <Link to={`/recipes/${recipe.slug}`} reloadDocument>
                 {recipe.name}
               </Link>
             </li>

@@ -7,7 +7,7 @@ export default {
   prerender: ({ getStaticPaths }) => {
     return [
       ...getStaticPaths(),
-      ...recipes.map((recipe) => `/recepies/${recipe.slug}`),
+      ...recipes.map((recipe) => `/recipes/${recipe.slug}`),
       ...(["post", "project"] as const).flatMap((type) => {
         const count = links.filter((link) => link.type === type).length;
         return Array.from(

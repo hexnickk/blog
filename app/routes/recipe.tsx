@@ -20,7 +20,7 @@ export default function Recipe({ loaderData: recipe }: Route.ComponentProps) {
   return (
     <main {...stylex.props(layoutStyles.layout)}>
       <p>
-        <Link to="/recepies" reloadDocument>
+        <Link to="/recipes" reloadDocument>
           Recipes
         </Link>
       </p>
