@@ -1,5 +1,25 @@
 export const recipes = [
   {
+    slug: "honey-soy-air-fryer-salmon",
+    name: "Honey soy air fryer salmon",
+    items: [
+      "2 salmon fillets (130–180 g each)",
+      "1 tbsp soy sauce",
+      "1 tbsp honey",
+      "1 tsp lemon juice",
+      "1 tsp olive oil",
+      "1 garlic clove, grated",
+      "A little bit of ginger",
+    ],
+    instructions: [
+      "Mix everything into a paste.",
+      "Pat the salmon dry and coat the top and sides with the glaze.",
+      "Marinate for 10–20 minutes.",
+      "Preheat the air fryer to 190°C for 3 minutes.",
+      "Cook skin-side down: 7–9 minutes for medium, or 10–12 minutes for thoroughly cooked salmon.",
+    ],
+  },
+  {
     slug: "cottage-cheese-casserole",
     name: "Cottage cheese casserole",
     items: [
